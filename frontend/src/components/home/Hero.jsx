@@ -169,7 +169,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="hero-section relative min-h-[100vh] w-full overflow-hidden">
       {/* Background Slideshow */}
       <div className="absolute inset-0">
         {/* Current Slide */}
@@ -184,7 +184,7 @@ const Hero = () => {
           <img
             src={slides[currentSlide].image}
             alt={slides[currentSlide].title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-navy/30 via-navy/10 to-navy/40" />
         </motion.div>
@@ -200,43 +200,43 @@ const Hero = () => {
           <img
             src={slides[nextSlide].image}
             alt={slides[nextSlide].title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-navy/30 via-navy/10 to-navy/40" />
         </motion.div>
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex flex-col items-center justify-center text-white px-4">
+      <div className="relative min-h-[100vh] flex flex-col items-center justify-center text-white px-4 py-16 md:py-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center max-w-5xl mx-auto"
+          className="text-center max-w-5xl mx-auto w-full"
         >
           {/* Logo */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-8"
+            className="mb-6 md:mb-8"
           >
             <img
               src="/images/Image Files/Image Files/logo horizontal.png"
               alt="TruView Real Estate"
-              className="h-32 md:h-40 mx-auto"
+              className="h-24 md:h-32 lg:h-40 mx-auto"
             />
           </motion.div>
 
-          <h1 className="text-4xl md:text-6xl font-light mb-6 tracking-wider uppercase">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 md:mb-6 tracking-wider uppercase">
             {slides[currentSlide].title}
           </h1>
-          <p className="text-lg md:text-xl mb-12 font-light tracking-widest uppercase">
+          <p className="text-base sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-widest uppercase">
             {slides[currentSlide].subtitle}
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
             <MagneticButton onClick={handleBuyClick} delay={0}>
               Buy
             </MagneticButton>
@@ -255,7 +255,7 @@ const Hero = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2"
       >
         <div className="w-6 h-10 border border-white/30 rounded-full flex justify-center">
           <motion.div

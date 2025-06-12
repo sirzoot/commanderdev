@@ -17,6 +17,7 @@ const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [isHeroInView, setIsHeroInView] = useState(true);
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
@@ -24,8 +25,14 @@ const Navbar = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setIsScrolled(currentScrollY > 50);
-      
+
       if (isHomePage) {
+        const hero = document.querySelector('.hero-section');
+        if (hero) {
+          const rect = hero.getBoundingClientRect();
+          // Only show navbar if the top of the hero is at or above the top of the viewport (i.e., user is at the very top)
+          setIsHeroInView(rect.top >= 0 && rect.bottom > window.innerHeight / 2);
+        }
         if (currentScrollY > lastScrollY) {
           setIsVisible(false);
         } else {
@@ -48,10 +55,13 @@ const Navbar = () => {
 
   const customEase = [0.16, 1, 0.3, 1];
 
+  // Only show navbar if hero is in view (top of page)
+  const shouldShowNavbar = showNavbar && (!isHomePage || isHeroInView);
+
   return (
     <>
       <AnimatePresence>
-        {showNavbar && (
+        {shouldShowNavbar && (
           <motion.nav
             initial={{ x: -100, opacity: 0 }}
             animate={{ 
