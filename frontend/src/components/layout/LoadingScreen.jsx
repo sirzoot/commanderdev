@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 const LoadingScreen = ({ onLoadingComplete }) => {
   const [currentScreen, setCurrentScreen] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
-  const counterRef = useRef(null);
   const [counter, setCounter] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showBrand, setShowBrand] = useState(false);
+  const [showCounter, setShowCounter] = useState(true);
 
   const loadingScreens = [
     { message: 'Loading Experience', duration: 1000 },
@@ -14,7 +16,9 @@ const LoadingScreen = ({ onLoadingComplete }) => {
     { message: 'Welcome to Realty', duration: 1000 },
   ];
 
+  // Custom easing functions for premium feel
   const customEase = [0.18, 0.71, 0.11, 1];
+  const slideEase = [0.65, 0, 0.35, 1]; // Smooth slide animation
 
   useEffect(() => {
     let startTime;
@@ -55,12 +59,22 @@ const LoadingScreen = ({ onLoadingComplete }) => {
       currentDuration += screen.duration;
     });
 
+    // Sequence the animations
     setTimeout(() => {
-      setIsExiting(true);
+      setShowCounter(false); // Hide counter before welcome animation
       setTimeout(() => {
-        setIsLoading(false);
-        onLoadingComplete();
-      }, 800);
+        setShowWelcome(true);
+        setTimeout(() => {
+          setShowBrand(true);
+          setTimeout(() => {
+            setIsExiting(true);
+            setTimeout(() => {
+              setIsLoading(false);
+              onLoadingComplete();
+            }, 800);
+          }, 1000);
+        }, 500);
+      }, 300); // Small delay before welcome animation starts
     }, totalDuration);
   }, [onLoadingComplete]);
 
@@ -80,12 +94,13 @@ const LoadingScreen = ({ onLoadingComplete }) => {
           <div className="relative w-full h-full flex flex-col items-center justify-center">
             {/* Corner Gradients */}
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-0 left-0 w-1/3 h-1/3 bg-gradient-to-br from-blue-50/50 to-transparent" />
-              <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-bl from-blue-50/50 to-transparent" />
-              <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-blue-50/50 to-transparent" />
-              <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-blue-50/50 to-transparent" />
+              <div className="absolute top-0 left-0 w-1/3 h-1/3 bg-gradient-to-br from-gray-100/50 to-transparent" />
+              <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-bl from-gray-100/50 to-transparent" />
+              <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-gray-100/50 to-transparent" />
+              <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-gray-100/50 to-transparent" />
             </div>
 
+            {/* Initial Loading Screen */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -96,7 +111,7 @@ const LoadingScreen = ({ onLoadingComplete }) => {
               <div className="relative">
                 <img
                   src="/images/Image Files/Image Files/logo.png"
-                  alt="TruView Real Estate"
+                  alt="Showcase Realty"
                   className="h-64 w-auto"
                   style={{
                     maskImage: 'url(/images/icon-ellipse.svg)',
@@ -110,32 +125,92 @@ const LoadingScreen = ({ onLoadingComplete }) => {
                   }}
                 />
               </div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5, ease: customEase }}
-                className="mt-12 text-center"
-              >
-                <motion.h2
-                  key={currentScreen}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5, ease: customEase }}
-                  className="text-3xl font-light tracking-wider text-gray-800"
-                >
-                  {loadingScreens[currentScreen].message}
-                </motion.h2>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="mt-8 text-5xl font-light text-gray-800"
-                >
-                  {counter}%
-                </motion.div>
-              </motion.div>
+              <AnimatePresence>
+                {showCounter && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="mt-8 text-5xl font-light text-gray-800"
+                  >
+                    {counter}%
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
+
+            {/* Welcome Panel */}
+            <AnimatePresence>
+              {showWelcome && (
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ duration: 1, ease: slideEase }}
+                  className="absolute top-0 left-0 w-full h-1/2 bg-white flex items-center justify-center overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%)',
+                  }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3, duration: 0.8, ease: customEase }}
+                    className="w-full h-full relative"
+                  >
+                    <img
+                      src="/images/11-web-or-mls-ARC04382 (1).jpg"
+                      alt="Welcome to"
+                      className="w-full h-full"
+                      style={{
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                        maxHeight: '100%',
+                        maxWidth: '100%',
+                        padding: '1rem'
+                      }}
+                    />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Brand Panel */}
+            <AnimatePresence>
+              {showBrand && (
+                <motion.div
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  transition={{ duration: 1, ease: slideEase }}
+                  className="absolute bottom-0 left-0 w-full h-1/2 bg-white flex items-center justify-center overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(0deg, #ffffff 0%, #f8f9fa 100%)',
+                  }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3, duration: 0.8, ease: customEase }}
+                    className="w-full h-full relative"
+                  >
+                    <img
+                      src="/images/18-web-or-mls-ARC04424.jpg"
+                      alt="Showcase Realty"
+                      className="w-full h-full"
+                      style={{
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                        maxHeight: '100%',
+                        maxWidth: '100%',
+                        padding: '1rem'
+                      }}
+                    />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
       )}

@@ -26,9 +26,9 @@ const Preloader = ({ onLoadingComplete }) => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="text-4xl font-bold text-blue-600">Showcase</div>
+        <div className="text-4xl font-bold text-navy">Showcase</div>
         <motion.div
-          className="absolute -bottom-2 left-0 h-1 bg-blue-600"
+          className="absolute -bottom-2 left-0 h-1 bg-gold"
           initial={{ width: 0 }}
           animate={{ width: '100%' }}
           transition={{ duration: 2, ease: 'easeInOut' }}

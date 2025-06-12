@@ -14,12 +14,12 @@ const TimelineItem = ({ year, title, description, image, delay }) => {
       transition={{ duration: 0.5, delay }}
       className="relative pl-8 pb-12 border-l-2 border-gray-200"
     >
-      <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-blue-600" />
+      <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gold" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <span className="text-blue-600 font-semibold">{year}</span>
+          <span className="text-gold font-semibold">{year}</span>
           <h3 className="text-xl font-bold mt-2 mb-4">{title}</h3>
-          <p className="text-gray-600">{description}</p>
+          <p className="text-charcoal">{description}</p>
         </div>
         <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
           <img
@@ -53,8 +53,8 @@ const TeamMember = ({ name, title, image, description, delay }) => {
         />
       </div>
       <h3 className="text-xl font-bold mb-1">{name}</h3>
-      <p className="text-blue-600 mb-4">{title}</p>
-      <p className="text-gray-600 max-w-xs mx-auto">{description}</p>
+      <p className="text-navy mb-4">{title}</p>
+      <p className="text-charcoal max-w-xs mx-auto">{description}</p>
     </motion.div>
   );
 };
@@ -118,7 +118,7 @@ const About = () => {
             alt="About Us"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-navy/50" />
         </div>
         <div className="relative text-center text-white max-w-3xl mx-auto px-4">
           <motion.h1
@@ -149,10 +149,10 @@ const About = () => {
             transition={{ duration: 0.5 }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">
               Our Journey
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-charcoal max-w-2xl mx-auto">
               From humble beginnings to becoming a trusted name in real estate
             </p>
           </motion.div>
@@ -178,10 +178,10 @@ const About = () => {
             transition={{ duration: 0.5 }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">
               Meet Our Team
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-charcoal max-w-2xl mx-auto">
               Dedicated professionals committed to your real estate success
             </p>
           </motion.div>
@@ -199,7 +199,7 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-blue-600 text-white">
+      <section className="py-20 bg-navy text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -215,7 +215,7 @@ const About = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="btn btn-outline"
+              className="btn btn-outline hover:text-navy"
             >
               Contact Us
             </motion.button>

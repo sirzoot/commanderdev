@@ -27,10 +27,8 @@ const Navbar = () => {
       
       if (isHomePage) {
         if (currentScrollY > lastScrollY) {
-          // Scrolling down
           setIsVisible(false);
         } else {
-          // Scrolling up
           setIsVisible(true);
         }
         setLastScrollY(currentScrollY);
@@ -42,7 +40,6 @@ const Navbar = () => {
   }, [lastScrollY, isHomePage]);
 
   useEffect(() => {
-    // Show navbar after a short delay to sync with loading screen
     const timer = setTimeout(() => {
       setShowNavbar(true);
     }, 2800);
@@ -56,104 +53,130 @@ const Navbar = () => {
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
-            initial={{ y: -100, opacity: 0 }}
+            initial={{ x: -100, opacity: 0 }}
             animate={{ 
-              y: 0, 
+              x: 0, 
               opacity: 1,
-              height: isHomePage && !isVisible ? '0px' : '80px'
+              height: isHomePage && !isVisible ? '0px' : '100vh'
             }}
             transition={{ duration: 0.8, ease: customEase }}
-            className={`fixed w-full z-50 transition-all duration-300 overflow-hidden ${
+            className={`fixed left-0 top-0 z-50 transition-all duration-300 overflow-hidden ${
               isHomePage 
-                ? (isScrolled ? 'bg-white/90 backdrop-blur-sm shadow-sm' : 'bg-transparent')
-                : 'bg-white/90 backdrop-blur-sm shadow-sm'
+                ? (isScrolled ? 'bg-white/90 backdrop-blur-sm' : 'bg-transparent')
+                : 'bg-white/90 backdrop-blur-sm'
             }`}
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-center items-center h-20">
-                <div className="flex items-center space-x-12">
-                  <motion.div
-                    initial={{ scale: 0.4, opacity: 0 }}
-                    animate={{ 
-                      scale: 1, 
-                      opacity: isHomePage && !isVisible ? 0 : 1 
-                    }}
-                    transition={{ duration: 0.5, ease: customEase }}
-                    className="flex-shrink-0"
+            <div className="h-full flex flex-col justify-between py-12 px-8">
+              {/* Logo */}
+              <motion.div
+                initial={{ scale: 0.4, opacity: 0 }}
+                animate={{ 
+                  scale: 1, 
+                  opacity: isHomePage && !isVisible ? 0 : 1 
+                }}
+                transition={{ duration: 0.5, ease: customEase }}
+                className="mb-16"
+              >
+                <Link to="/" className="block">
+                  <img
+                    src="/images/Image Files/Image Files/logo.png"
+                    alt="TruView Real Estate"
+                    className={`h-12 transition-all duration-300 ${
+                      isHomePage && !isScrolled ? 'brightness-0 invert' : ''
+                    }`}
+                  />
+                </Link>
+              </motion.div>
+
+              {/* Navigation Links */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ 
+                  opacity: isHomePage && !isVisible ? 0 : 1, 
+                  y: 0 
+                }}
+                transition={{ duration: 0.5, delay: 0.2, ease: customEase }}
+                className="flex-1 flex flex-col justify-center space-y-8"
+              >
+                {navigation.map((item, index) => (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="group relative"
                   >
-                    <Link to="/" className="block">
-                      <img
-                        src="/images/Image Files/Image Files/logo.png"
-                        alt="TruView Real Estate"
-                        className={`h-12 transition-all duration-300 ${
-                          isHomePage && !isScrolled ? 'brightness-0 invert' : ''
-                        }`}
-                      />
-                    </Link>
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ 
-                      opacity: isHomePage && !isVisible ? 0 : 1, 
-                      y: 0 
-                    }}
-                    transition={{ duration: 0.5, delay: 0.2, ease: customEase }}
-                    className="hidden md:flex items-center space-x-8"
-                  >
-                    {navigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={`${
-                          isHomePage && !isScrolled 
-                            ? 'text-white hover:text-white/80' 
-                            : 'text-gray-800 hover:text-gray-600'
-                        } px-3 py-2 text-sm font-light tracking-wider uppercase transition-colors duration-200`}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`px-8 py-3 text-sm font-light tracking-wider uppercase transition-all duration-300 ${
-                        isHomePage && !isScrolled
-                          ? 'bg-white text-black hover:bg-opacity-90'
-                          : 'bg-black text-white hover:bg-gray-800'
+                    <motion.div
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className={`text-2xl font-light tracking-wider uppercase transition-all duration-300 ${
+                        isHomePage && !isScrolled 
+                          ? 'text-white hover:text-white/80' 
+                          : 'text-gray-800 hover:text-gray-600'
                       }`}
                     >
-                      Get Estimate
-                    </motion.button>
-                  </motion.div>
-                </div>
+                      {item.name}
+                      {location.pathname === item.href && (
+                        <motion.div
+                          layoutId="activeNav"
+                          className="absolute -left-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-current"
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </motion.div>
+                  </Link>
+                ))}
+              </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ 
-                    opacity: isHomePage && !isVisible ? 0 : 1, 
-                    y: 0 
-                  }}
-                  transition={{ duration: 0.5, delay: 0.2, ease: customEase }}
-                  className="md:hidden absolute right-4"
+              {/* CTA Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ 
+                  opacity: isHomePage && !isVisible ? 0 : 1, 
+                  y: 0 
+                }}
+                transition={{ duration: 0.5, delay: 0.4, ease: customEase }}
+                className="mt-16"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-full px-8 py-3 text-sm font-light tracking-wider uppercase transition-all duration-300 ${
+                    isHomePage && !isScrolled
+                      ? 'bg-white text-charcoal hover:bg-opacity-90'
+                      : 'bg-navy text-white hover:bg-gray-800'
+                  }`}
                 >
-                  <button
-                    type="button"
-                    className={`inline-flex items-center justify-center p-2 rounded-md ${
-                      isHomePage && !isScrolled ? 'text-white' : 'text-gray-700'
-                    } hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500`}
-                    onClick={() => setMobileMenuOpen(true)}
-                  >
-                    <span className="sr-only">Open main menu</span>
-                    <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-                  </button>
-                </motion.div>
-              </div>
+                  Get Estimate
+                </motion.button>
+              </motion.div>
             </div>
           </motion.nav>
         )}
       </AnimatePresence>
 
+      {/* Mobile Menu Button */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ 
+          opacity: isHomePage && !isVisible ? 0 : 1, 
+          y: 0 
+        }}
+        transition={{ duration: 0.5, delay: 0.2, ease: customEase }}
+        className="md:hidden fixed top-4 right-4 z-50"
+      >
+        <button
+          type="button"
+          className={`inline-flex items-center justify-center p-2 rounded-md ${
+            isHomePage && !isScrolled ? 'text-white' : 'text-gray-700'
+          } hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500`}
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <span className="sr-only">Open main menu</span>
+          <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+        </button>
+      </motion.div>
+
+      {/* Mobile Menu */}
       <Dialog
         as="div"
         className="md:hidden"
@@ -197,7 +220,7 @@ const Navbar = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full px-8 py-3 text-sm font-light tracking-wider uppercase bg-black text-white hover:bg-gray-800 transition-all duration-300"
+                  className="w-full px-8 py-3 text-sm font-light tracking-wider uppercase bg-navy text-white hover:bg-gray-800 transition-all duration-300"
                 >
                   Get Estimate
                 </motion.button>

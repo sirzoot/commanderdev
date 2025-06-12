@@ -25,7 +25,7 @@ const ListingCard = ({ listing, onClick, size = 'normal' }) => {
           alt={listing.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
       
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
@@ -38,7 +38,7 @@ const ListingCard = ({ listing, onClick, size = 'normal' }) => {
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           whileHover={{ opacity: 1, y: 0 }}
-          className="mt-4 px-6 py-2 bg-white text-black text-sm font-light tracking-wider uppercase hover:bg-opacity-90 transition-all duration-300"
+          className="mt-4 px-6 py-2 bg-white text-charcoal text-sm font-light tracking-wider uppercase hover:bg-opacity-90 transition-all duration-300"
         >
           View Details
         </motion.button>
@@ -187,7 +187,7 @@ const Listings = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-4">
             <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-light tracking-wider"
+              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
               value={filters.priceRange}
               onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
             >
@@ -199,7 +199,7 @@ const Listings = () => {
             </select>
 
             <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-light tracking-wider"
+              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
               value={filters.beds}
               onChange={(e) => setFilters({ ...filters, beds: e.target.value })}
             >
@@ -211,7 +211,7 @@ const Listings = () => {
             </select>
 
             <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-light tracking-wider"
+              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
               value={filters.baths}
               onChange={(e) => setFilters({ ...filters, baths: e.target.value })}
             >
@@ -222,7 +222,7 @@ const Listings = () => {
             </select>
 
             <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-light tracking-wider"
+              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
               value={filters.type}
               onChange={(e) => setFilters({ ...filters, type: e.target.value })}
             >
@@ -277,7 +277,7 @@ const Listings = () => {
                   <Dialog.Title className="text-2xl font-light tracking-wider uppercase mb-2">
                     {selectedListing.title}
                   </Dialog.Title>
-                  <p className="text-3xl font-light text-blue-600 mb-4">
+                  <p className="text-3xl font-light text-gold mb-4">
                     ${selectedListing.price.toLocaleString()}
                   </p>
                   <div className="grid grid-cols-2 gap-4 mb-6">
@@ -301,7 +301,7 @@ const Listings = () => {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full px-8 py-3 bg-black text-white font-light tracking-wider uppercase text-sm hover:bg-gray-800 transition-all duration-300"
+                    className="w-full px-8 py-3 bg-navy text-white font-light tracking-wider uppercase text-sm hover:bg-charcoal transition-all duration-300"
                   >
                     Schedule a Viewing
                   </motion.button>

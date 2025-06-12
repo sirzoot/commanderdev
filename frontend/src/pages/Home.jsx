@@ -6,8 +6,8 @@ const Home = () => {
   return (
     <main>
       <Hero />
-      <Stats />
       <FeaturedListings />
+      <Stats />
     </main>
   );
 };

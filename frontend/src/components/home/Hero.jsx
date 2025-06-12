@@ -1,10 +1,54 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const Modal = ({ isOpen, onClose, title, children }) => {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/50 z-50"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ 
+              duration: 0.4,
+              ease: [0.18, 0.71, 0.11, 1]
+            }}
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-lg shadow-xl z-50 p-6"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-light">{title}</h3>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {children}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [nextSlide, setNextSlide] = useState(1);
+  const [isSellModalOpen, setIsSellModalOpen] = useState(false);
+  const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
 
   const slides = [
     {
@@ -42,12 +86,26 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, [isAutoPlaying, currentSlide, slides.length]);
 
-  const handleSlideChange = (index) => {
-    setNextSlide(index);
-    setTimeout(() => {
-      setCurrentSlide(index);
-    }, 1000);
-    setIsAutoPlaying(false);
+  const handleBuyClick = () => {
+    const listingsSection = document.getElementById('featured-listings');
+    if (listingsSection) {
+      listingsSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  const handleSellSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission
+    setIsSellModalOpen(false);
+  };
+
+  const handleEstimateSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission
+    setIsEstimateModalOpen(false);
   };
 
   return (
@@ -68,7 +126,7 @@ const Hero = () => {
             alt={slides[currentSlide].title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-navy/30 via-navy/10 to-navy/40" />
         </motion.div>
 
         {/* Next Slide (for transition) */}
@@ -84,7 +142,7 @@ const Hero = () => {
             alt={slides[nextSlide].title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-navy/30 via-navy/10 to-navy/40" />
         </motion.div>
       </div>
 
@@ -122,13 +180,15 @@ const Hero = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-12 py-4 bg-white text-black font-light tracking-wider uppercase text-sm hover:bg-opacity-90 transition-all duration-300"
+              onClick={handleBuyClick}
+              className="px-12 py-4 bg-white text-charcoal font-light tracking-wider uppercase text-sm hover:bg-opacity-90 transition-all duration-300"
             >
               Buy
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => setIsSellModalOpen(true)}
               className="px-12 py-4 bg-transparent border border-white text-white font-light tracking-wider uppercase text-sm hover:bg-white hover:bg-opacity-10 transition-all duration-300"
             >
               Sell
@@ -136,6 +196,7 @@ const Hero = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => setIsEstimateModalOpen(true)}
               className="px-12 py-4 bg-transparent border border-white text-white font-light tracking-wider uppercase text-sm hover:bg-white hover:bg-opacity-10 transition-all duration-300"
             >
               Get Estimate
@@ -143,37 +204,6 @@ const Hero = () => {
           </div>
         </motion.div>
       </div>
-
-      {/* Navigation Dots */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => handleSlideChange(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              currentSlide === index ? 'bg-white scale-150' : 'bg-white/30'
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* Arrow Navigation */}
-      <button
-        onClick={() => handleSlideChange((currentSlide - 1 + slides.length) % slides.length)}
-        className="absolute left-8 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors duration-300"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <button
-        onClick={() => handleSlideChange((currentSlide + 1) % slides.length)}
-        className="absolute right-8 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors duration-300"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
 
       {/* Scroll Indicator */}
       <motion.div
@@ -196,6 +226,111 @@ const Hero = () => {
           />
         </div>
       </motion.div>
+
+      {/* Sell Modal */}
+      <Modal
+        isOpen={isSellModalOpen}
+        onClose={() => setIsSellModalOpen(false)}
+        title="Home Valuation"
+      >
+        <form onSubmit={handleSellSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Address</label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Name</label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Email</label>
+            <input
+              type="email"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Phone</label>
+            <input
+              type="tel"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            />
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            className="w-full px-4 py-2 bg-navy text-white rounded-md hover:bg-charcoal transition-colors"
+          >
+            Submit
+          </motion.button>
+        </form>
+      </Modal>
+
+      {/* Estimate Modal */}
+      <Modal
+        isOpen={isEstimateModalOpen}
+        onClose={() => setIsEstimateModalOpen(false)}
+        title="Get Your Estimate"
+      >
+        <form onSubmit={handleEstimateSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Property Address</label>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Property Type</label>
+            <select
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            >
+              <option value="">Select type</option>
+              <option value="single-family">Single Family</option>
+              <option value="condo">Condo</option>
+              <option value="townhouse">Townhouse</option>
+              <option value="multi-family">Multi-Family</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Square Footage</label>
+            <input
+              type="number"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-charcoal mb-1">Contact Email</label>
+            <input
+              type="email"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+              required
+            />
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            className="w-full px-4 py-2 bg-navy text-white rounded-md hover:bg-charcoal transition-colors"
+          >
+            Get Estimate
+          </motion.button>
+        </form>
+      </Modal>
     </div>
   );
 };
