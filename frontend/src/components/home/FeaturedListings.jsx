@@ -157,7 +157,15 @@ const FeaturedListings = () => {
           }
         }}>
           {/* View All Listings Card */}
-          <div className="bg-white/95 backdrop-blur-sm p-10 rounded-l-lg shadow-xl border-l border-t border-b border-charcoal/10">
+          <motion.div 
+            whileHover={{ 
+              scale: 1.02,
+              rotateX: 2,
+              rotateY: -2,
+              transition: { duration: 0.2 }
+            }}
+            className="bg-white/95 backdrop-blur-sm p-10 rounded-l-lg shadow-xl border-l border-t border-b border-charcoal/10 hover:shadow-2xl transition-shadow duration-300"
+          >
             <motion.h3 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -175,16 +183,34 @@ const FeaturedListings = () => {
               Explore our complete collection of premium properties
             </motion.p>
             <motion.button
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ 
+                scale: 1.02,
+                backgroundColor: "#1a1a1a",
+                transition: { duration: 0.2 }
+              }}
               whileTap={{ scale: 0.98 }}
-              className="w-full px-8 py-5 bg-charcoal text-white font-light tracking-wider uppercase text-sm hover:bg-charcoal/90 transition-all duration-300"
+              className="w-full px-8 py-5 bg-charcoal text-white font-light tracking-wider uppercase text-sm hover:bg-charcoal/90 transition-all duration-300 relative overflow-hidden group"
             >
-              View All Listings
+              <motion.span
+                className="absolute inset-0 bg-white/10"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: "100%" }}
+                transition={{ duration: 0.5 }}
+              />
+              <span className="relative z-10">View All Listings</span>
             </motion.button>
-          </div>
+          </motion.div>
 
           {/* Contact Card */}
-          <div className="bg-white/95 backdrop-blur-sm p-10 rounded-l-lg shadow-xl border-l border-t border-b border-charcoal/10">
+          <motion.div 
+            whileHover={{ 
+              scale: 1.02,
+              rotateX: 2,
+              rotateY: -2,
+              transition: { duration: 0.2 }
+            }}
+            className="bg-white/95 backdrop-blur-sm p-10 rounded-l-lg shadow-xl border-l border-t border-b border-charcoal/10 hover:shadow-2xl transition-shadow duration-300"
+          >
             <motion.h3 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -202,13 +228,23 @@ const FeaturedListings = () => {
               Ready to find your perfect home? Our experts are here to help.
             </motion.p>
             <motion.button
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ 
+                scale: 1.02,
+                backgroundColor: "#f5f5f5",
+                transition: { duration: 0.2 }
+              }}
               whileTap={{ scale: 0.98 }}
-              className="w-full px-8 py-5 bg-white text-charcoal font-light tracking-wider uppercase text-sm hover:bg-gray-50 transition-all duration-300 border border-charcoal/20"
+              className="w-full px-8 py-5 bg-white text-charcoal font-light tracking-wider uppercase text-sm hover:bg-gray-50 transition-all duration-300 border border-charcoal/20 relative overflow-hidden group"
             >
-              Contact Us
+              <motion.span
+                className="absolute inset-0 bg-charcoal/5"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: "100%" }}
+                transition={{ duration: 0.5 }}
+              />
+              <span className="relative z-10">Contact Us</span>
             </motion.button>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
 
