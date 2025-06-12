@@ -42,11 +42,11 @@ const Navbar = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowNavbar(true);
-    }, 2800);
+    }, 1800);
     return () => clearTimeout(timer);
   }, []);
 
-  const customEase = [0.18, 0.71, 0.11, 1];
+  const customEase = [0.16, 1, 0.3, 1];
 
   return (
     <>
@@ -59,8 +59,8 @@ const Navbar = () => {
               opacity: 1,
               height: isHomePage && !isVisible ? '0px' : '100vh'
             }}
-            transition={{ duration: 0.8, ease: customEase }}
-            className={`fixed left-0 top-0 z-50 transition-all duration-300 overflow-hidden ${
+            transition={{ duration: 0.5, ease: customEase }}
+            className={`fixed left-0 top-0 z-50 transition-all duration-200 overflow-hidden ${
               isHomePage 
                 ? (isScrolled ? 'bg-white/90 backdrop-blur-sm' : 'bg-transparent')
                 : 'bg-white/90 backdrop-blur-sm'
@@ -74,7 +74,7 @@ const Navbar = () => {
                   scale: 1, 
                   opacity: isHomePage && !isVisible ? 0 : 1 
                 }}
-                transition={{ duration: 0.5, ease: customEase }}
+                transition={{ duration: 0.4, ease: customEase }}
                 className="mb-16"
               >
                 <Link to="/" className="block">
@@ -95,7 +95,7 @@ const Navbar = () => {
                   opacity: isHomePage && !isVisible ? 0 : 1, 
                   y: 0 
                 }}
-                transition={{ duration: 0.5, delay: 0.2, ease: customEase }}
+                transition={{ duration: 0.4, delay: 0.1, ease: customEase }}
                 className="flex-1 flex flex-col justify-center space-y-8"
               >
                 {navigation.map((item, index) => (
@@ -134,7 +134,7 @@ const Navbar = () => {
                   opacity: isHomePage && !isVisible ? 0 : 1, 
                   y: 0 
                 }}
-                transition={{ duration: 0.5, delay: 0.4, ease: customEase }}
+                transition={{ duration: 0.4, delay: 0.2, ease: customEase }}
                 className="mt-16"
               >
                 <motion.button
@@ -161,7 +161,7 @@ const Navbar = () => {
           opacity: isHomePage && !isVisible ? 0 : 1, 
           y: 0 
         }}
-        transition={{ duration: 0.5, delay: 0.2, ease: customEase }}
+        transition={{ duration: 0.4, delay: 0.1, ease: customEase }}
         className="md:hidden fixed top-4 right-4 z-50"
       >
         <button
