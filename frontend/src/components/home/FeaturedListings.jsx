@@ -1,5 +1,5 @@
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useScroll, useTransform, useInView, useMotionValueEvent } from 'framer-motion';
+import { useRef, useState } from 'react';
 
 const PropertyShowcase = ({ listing, index, totalListings }) => {
   const containerRef = useRef(null);
@@ -84,16 +84,19 @@ const PropertyShowcase = ({ listing, index, totalListings }) => {
           </motion.div>
         </div>
       </div>
-
-      {/* Property Counter */}
-      <div className="absolute top-8 right-8 text-gray-400 font-light tracking-wider">
-        {index + 1} / {totalListings}
-      </div>
     </motion.div>
   );
 };
 
 const FeaturedListings = () => {
+  const [showFloatingButton, setShowFloatingButton] = useState(false);
+  const { scrollYProgress } = useScroll();
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    // Show between 20% and 80% of the page scroll
+    setShowFloatingButton(latest > 0.2 && latest < 0.8);
+  });
+
   const listings = [
     {
       image: '/images/9480-virginia-center-blvd-vienna-va-22181/images-for-web-or-mls/1-web-or-mls-MAX_0225.JPG',
@@ -131,6 +134,84 @@ const FeaturedListings = () => {
 
   return (
     <section id="featured-listings" className="relative bg-white">
+      {/* Floating CTA Sections */}
+      <motion.div
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ 
+          opacity: showFloatingButton ? 1 : 0,
+          x: showFloatingButton ? 0 : 100
+        }}
+        transition={{ 
+          duration: 0.3,
+          ease: "easeInOut"
+        }}
+        className="fixed right-0 top-0 h-screen flex items-center z-50 w-[400px] pr-8"
+      >
+        <div className="flex flex-col gap-6" style={{
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          }
+        }}>
+          {/* View All Listings Card */}
+          <div className="bg-white/95 backdrop-blur-sm p-10 rounded-l-lg shadow-xl border-l border-t border-b border-charcoal/10">
+            <motion.h3 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl font-light tracking-wider uppercase text-charcoal mb-8"
+            >
+              Ready for More?
+            </motion.h3>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-charcoal/80 font-light text-lg mb-10"
+            >
+              Explore our complete collection of premium properties
+            </motion.p>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full px-8 py-5 bg-charcoal text-white font-light tracking-wider uppercase text-sm hover:bg-charcoal/90 transition-all duration-300"
+            >
+              View All Listings
+            </motion.button>
+          </div>
+
+          {/* Contact Card */}
+          <div className="bg-white/95 backdrop-blur-sm p-10 rounded-l-lg shadow-xl border-l border-t border-b border-charcoal/10">
+            <motion.h3 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-4xl font-light tracking-wider uppercase text-charcoal mb-8"
+            >
+              Let's Connect
+            </motion.h3>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-charcoal/80 font-light text-lg mb-10"
+            >
+              Ready to find your perfect home? Our experts are here to help.
+            </motion.p>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full px-8 py-5 bg-white text-charcoal font-light tracking-wider uppercase text-sm hover:bg-gray-50 transition-all duration-300 border border-charcoal/20"
+            >
+              Contact Us
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Section Header */}
       <div className="min-h-[40vh] flex items-center justify-center py-2">
         <motion.div

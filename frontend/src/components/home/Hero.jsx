@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   return (
@@ -49,6 +49,7 @@ const Hero = () => {
   const [nextSlide, setNextSlide] = useState(1);
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
   const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const slides = [
     {
@@ -86,6 +87,18 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, [isAutoPlaying, currentSlide, slides.length]);
 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: e.clientX,
+        y: e.clientY
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   const handleBuyClick = () => {
     const listingsSection = document.getElementById('featured-listings');
     if (listingsSection) {
@@ -106,6 +119,53 @@ const Hero = () => {
     e.preventDefault();
     // Handle form submission
     setIsEstimateModalOpen(false);
+  };
+
+  const MagneticButton = ({ children, onClick, delay }) => {
+    const buttonRef = useRef(null);
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const handleMouseMove = (e) => {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      const distance = Math.sqrt(
+        Math.pow(e.clientX - centerX, 2) + 
+        Math.pow(e.clientY - centerY, 2)
+      );
+      
+      if (distance < 300) {
+        const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+        const force = (300 - distance) / 300;
+        x.set(Math.cos(angle) * force * 30);
+        y.set(Math.sin(angle) * force * 30);
+      } else {
+        x.set(0);
+        y.set(0);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      x.set(0);
+      y.set(0);
+    };
+
+    return (
+      <motion.button
+        ref={buttonRef}
+        style={{ x, y }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onClick={onClick}
+        className="px-12 py-4 bg-white text-charcoal font-light tracking-wider uppercase text-sm hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl"
+      >
+        {children}
+      </motion.button>
+    );
   };
 
   return (
@@ -177,30 +237,15 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleBuyClick}
-              className="px-12 py-4 bg-white text-charcoal font-light tracking-wider uppercase text-sm hover:bg-opacity-90 transition-all duration-300"
-            >
+            <MagneticButton onClick={handleBuyClick} delay={0}>
               Buy
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setIsSellModalOpen(true)}
-              className="px-12 py-4 bg-transparent border border-white text-white font-light tracking-wider uppercase text-sm hover:bg-white hover:bg-opacity-10 transition-all duration-300"
-            >
+            </MagneticButton>
+            <MagneticButton onClick={() => setIsSellModalOpen(true)} delay={0.2}>
               Sell
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setIsEstimateModalOpen(true)}
-              className="px-12 py-4 bg-transparent border border-white text-white font-light tracking-wider uppercase text-sm hover:bg-white hover:bg-opacity-10 transition-all duration-300"
-            >
+            </MagneticButton>
+            <MagneticButton onClick={() => setIsEstimateModalOpen(true)} delay={0.4}>
               Get Estimate
-            </motion.button>
+            </MagneticButton>
           </div>
         </motion.div>
       </div>

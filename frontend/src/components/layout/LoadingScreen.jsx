@@ -11,14 +11,14 @@ const LoadingScreen = ({ onLoadingComplete }) => {
   const [showCounter, setShowCounter] = useState(true);
 
   const loadingScreens = [
-    { message: 'Loading Experience', duration: 1000 },
-    { message: 'Preparing Showcase', duration: 1000 },
-    { message: 'Welcome to Realty', duration: 1000 },
+    { message: 'Loading Experience', duration: 400 },
+    { message: 'Preparing Showcase', duration: 400 },
+    { message: 'Welcome to Realty', duration: 400 },
   ];
 
   // Custom easing functions for premium feel
   const customEase = [0.18, 0.71, 0.11, 1];
-  const slideEase = [0.65, 0, 0.35, 1]; // Smooth slide animation
+  const slideEase = [0.2, 0.8, 0.2, 1]; // Modified for quick-then-slow effect
 
   useEffect(() => {
     let startTime;
@@ -73,7 +73,7 @@ const LoadingScreen = ({ onLoadingComplete }) => {
               onLoadingComplete();
             }, 800);
           }, 1000);
-        }, 500);
+        }, 300); // Small delay before welcome animation starts
       }, 300); // Small delay before welcome animation starts
     }, totalDuration);
   }, [onLoadingComplete]);
@@ -144,10 +144,14 @@ const LoadingScreen = ({ onLoadingComplete }) => {
             <AnimatePresence>
               {showWelcome && (
                 <motion.div
-                  initial={{ x: '-100%' }}
-                  animate={{ x: 0 }}
+                  initial={{ x: '-120%' }}
+                  animate={{ x: '-10%' }}
                   exit={{ x: '-100%' }}
-                  transition={{ duration: 1, ease: slideEase }}
+                  transition={{ 
+                    duration: 1.2,
+                    ease: slideEase,
+                    times: [0, 0.3, 1] // Quick initial movement, then slow
+                  }}
                   className="absolute top-0 left-0 w-full h-1/2 bg-white flex items-center justify-center overflow-hidden"
                   style={{
                     background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%)',
@@ -156,7 +160,7 @@ const LoadingScreen = ({ onLoadingComplete }) => {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, duration: 0.8, ease: customEase }}
+                    transition={{ delay: 0.1, duration: 0.4, ease: customEase }}
                     className="w-full h-full relative"
                   >
                     <img
@@ -164,11 +168,12 @@ const LoadingScreen = ({ onLoadingComplete }) => {
                       alt="Welcome to"
                       className="w-full h-full"
                       style={{
-                        objectFit: 'contain',
+                        objectFit: 'cover',
                         objectPosition: 'center',
                         maxHeight: '100%',
                         maxWidth: '100%',
-                        padding: '1rem'
+                        padding: '0.5rem',
+                        aspectRatio: '16/9'
                       }}
                     />
                   </motion.div>
@@ -180,10 +185,14 @@ const LoadingScreen = ({ onLoadingComplete }) => {
             <AnimatePresence>
               {showBrand && (
                 <motion.div
-                  initial={{ x: '100%' }}
-                  animate={{ x: 0 }}
+                  initial={{ x: '120%' }}
+                  animate={{ x: '10%' }}
                   exit={{ x: '100%' }}
-                  transition={{ duration: 1, ease: slideEase }}
+                  transition={{ 
+                    duration: 1.2,
+                    ease: slideEase,
+                    times: [0, 0.3, 1] // Quick initial movement, then slow
+                  }}
                   className="absolute bottom-0 left-0 w-full h-1/2 bg-white flex items-center justify-center overflow-hidden"
                   style={{
                     background: 'linear-gradient(0deg, #ffffff 0%, #f8f9fa 100%)',
@@ -192,7 +201,7 @@ const LoadingScreen = ({ onLoadingComplete }) => {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, duration: 0.8, ease: customEase }}
+                    transition={{ delay: 0.1, duration: 0.4, ease: customEase }}
                     className="w-full h-full relative"
                   >
                     <img
@@ -200,11 +209,12 @@ const LoadingScreen = ({ onLoadingComplete }) => {
                       alt="Showcase Realty"
                       className="w-full h-full"
                       style={{
-                        objectFit: 'contain',
+                        objectFit: 'cover',
                         objectPosition: 'center',
                         maxHeight: '100%',
                         maxWidth: '100%',
-                        padding: '1rem'
+                        padding: '0.5rem',
+                        aspectRatio: '16/9'
                       }}
                     />
                   </motion.div>

@@ -99,7 +99,7 @@ const Stats = () => {
   useEffect(() => {
     if (isSectionInView) {
       controls.start({
-        scale: [1, 1.05, 1],
+        scale: [1, 1.02, 1],
         transition: {
           duration: 2,
           repeat: Infinity,
@@ -112,12 +112,14 @@ const Stats = () => {
     }
   }, [isSectionInView, controls]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission
+  };
+
   return (
     <section id="stats" className="relative bg-white py-20">
-      {/* Section Header */}
-      {/* Removed Section Header */}
-
-      {/* Consolidated Stat Showcase */}
+      {/* Stats Section */}
       <div ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
         <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
           {statsData.map((stat, index) => (
@@ -125,36 +127,99 @@ const Stats = () => {
               key={index}
               number={stat.number}
               label={stat.label}
-              delay={index * 0.2} // Staggered delay for each stat
+              delay={index * 0.2}
               animationType={stat.animationType}
             />
           ))}
         </div>
       </div>
 
-      {/* New Contact CTA */}
+      {/* Contact Form Section */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="bg-white py-20 px-4 sm:px-6 lg:px-8 text-center"
+        className="bg-white py-20 px-4 sm:px-6 lg:px-8"
       >
-        <div className="max-w-4xl mx-auto">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+        <div className="max-w-2xl mx-auto">
+          <motion.form
+            onSubmit={handleSubmit}
+            className="space-y-8"
             animate={controls}
-            className="relative px-20 py-10 rounded-full border border-black text-black font-light tracking-wider uppercase text-2xl md:text-3xl hover:bg-gray-100 transition-all duration-300 overflow-hidden"
           >
-            Contact Us
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              whileHover={{ width: "100%", opacity: 1 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="absolute inset-0 bg-white/10 rounded-full"
-              style={{ zIndex: -1 }}
-            />
-          </motion.button>
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-light tracking-wider uppercase text-charcoal mb-4">
+                Get in Touch
+              </h2>
+              <p className="text-charcoal/80 font-light text-lg">
+                Let's discuss your real estate needs
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-light text-charcoal/80 mb-2">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-light text-charcoal/80 mb-2">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-light text-charcoal/80 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-light text-charcoal/80 mb-2">
+                Phone
+              </label>
+              <input
+                type="tel"
+                className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-light text-charcoal/80 mb-2">
+                Message
+              </label>
+              <textarea
+                className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors h-32 resize-none"
+                required
+              />
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              className="w-full px-8 py-4 bg-charcoal text-white font-light tracking-wider uppercase text-sm hover:bg-charcoal/90 transition-all duration-300 rounded-lg"
+            >
+              Send Message
+            </motion.button>
+          </motion.form>
         </div>
       </motion.div>
     </section>
