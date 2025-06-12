@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const ListingCard = ({ listing, onClick, size = 'normal' }) => {
   const cardClasses = {
@@ -16,7 +17,7 @@ const ListingCard = ({ listing, onClick, size = 'normal' }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={`relative group cursor-pointer ${cardClasses[size]}`}
+      className={`relative group cursor-pointer ${cardClasses[size]} h-full`}
       onClick={() => onClick(listing)}
     >
       <div className="relative overflow-hidden rounded-lg h-full">
@@ -55,6 +56,7 @@ const Listings = () => {
     baths: 'all',
     type: 'all'
   });
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const listings = [
     {
@@ -182,77 +184,239 @@ const Listings = () => {
 
   return (
     <div className="min-h-screen pt-16">
-      {/* Filters */}
-      <div className="sticky top-16 z-40 bg-white/90 backdrop-blur-sm shadow-sm py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-4">
-            <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
-              value={filters.priceRange}
-              onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex gap-8">
+          {/* Gallery */}
+          <div className="flex-1">
+            <motion.div
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full"
+              style={{
+                gridAutoRows: 'minmax(250px, 1fr)',
+                gridAutoFlow: 'dense'
+              }}
             >
-              <option value="all">Any Price</option>
-              <option value="0-500000">Under $500k</option>
-              <option value="500000-1000000">$500k - $1M</option>
-              <option value="1000000-2000000">$1M - $2M</option>
-              <option value="2000000-999999999">$2M+</option>
-            </select>
-
-            <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
-              value={filters.beds}
-              onChange={(e) => setFilters({ ...filters, beds: e.target.value })}
-            >
-              <option value="all">Any Beds</option>
-              <option value="1">1+ Beds</option>
-              <option value="2">2+ Beds</option>
-              <option value="3">3+ Beds</option>
-              <option value="4">4+ Beds</option>
-            </select>
-
-            <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
-              value={filters.baths}
-              onChange={(e) => setFilters({ ...filters, baths: e.target.value })}
-            >
-              <option value="all">Any Baths</option>
-              <option value="1">1+ Baths</option>
-              <option value="2">2+ Baths</option>
-              <option value="3">3+ Baths</option>
-            </select>
-
-            <select
-              className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
-              value={filters.type}
-              onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-            >
-              <option value="all">Any Type</option>
-              <option value="house">House</option>
-              <option value="apartment">Apartment</option>
-              <option value="townhouse">Townhouse</option>
-            </select>
+              <AnimatePresence>
+                {filteredListings.map((listing) => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    onClick={setSelectedListing}
+                    size={listing.size}
+                  />
+                ))}
+              </AnimatePresence>
+            </motion.div>
           </div>
+
+          {/* Filters Panel */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="hidden lg:block w-80 flex-shrink-0"
+          >
+            <div className="sticky top-24 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-gray-100">
+              <h2 className="text-2xl font-light tracking-wider uppercase mb-6">Filters</h2>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Price Range</label>
+                  <select
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    value={filters.priceRange}
+                    onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
+                  >
+                    <option value="all">Any Price</option>
+                    <option value="0-500000">Under $500k</option>
+                    <option value="500000-1000000">$500k - $1M</option>
+                    <option value="1000000-2000000">$1M - $2M</option>
+                    <option value="2000000-999999999">$2M+</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Bedrooms</label>
+                  <select
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    value={filters.beds}
+                    onChange={(e) => setFilters({ ...filters, beds: e.target.value })}
+                  >
+                    <option value="all">Any Beds</option>
+                    <option value="1">1+ Beds</option>
+                    <option value="2">2+ Beds</option>
+                    <option value="3">3+ Beds</option>
+                    <option value="4">4+ Beds</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Bathrooms</label>
+                  <select
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    value={filters.baths}
+                    onChange={(e) => setFilters({ ...filters, baths: e.target.value })}
+                  >
+                    <option value="all">Any Baths</option>
+                    <option value="1">1+ Baths</option>
+                    <option value="2">2+ Baths</option>
+                    <option value="3">3+ Baths</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Property Type</label>
+                  <select
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    value={filters.type}
+                    onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                  >
+                    <option value="all">Any Type</option>
+                    <option value="house">House</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="townhouse">Townhouse</option>
+                  </select>
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setFilters({
+                    priceRange: 'all',
+                    beds: 'all',
+                    baths: 'all',
+                    type: 'all'
+                  })}
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-600 font-light tracking-wider hover:bg-gray-50 transition-all duration-300"
+                >
+                  Reset Filters
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Gallery */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-[250px]"
+      {/* Mobile Filters Button */}
+      <div className="lg:hidden fixed bottom-6 right-6 z-40">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setMobileFiltersOpen(true)}
+          className="px-6 py-3 bg-navy text-white font-light tracking-wider uppercase text-sm rounded-full shadow-lg hover:bg-charcoal transition-all duration-300"
         >
-          <AnimatePresence>
-            {filteredListings.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-                onClick={setSelectedListing}
-                size={listing.size}
-              />
-            ))}
-          </AnimatePresence>
-        </motion.div>
+          Filters
+        </motion.button>
       </div>
+
+      {/* Mobile Filters Modal */}
+      <Dialog
+        open={mobileFiltersOpen}
+        onClose={() => setMobileFiltersOpen(false)}
+        className="relative z-50 lg:hidden"
+      >
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        
+        <div className="fixed inset-0 flex items-end justify-center p-4">
+          <Dialog.Panel className="w-full max-w-md rounded-t-2xl bg-white p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-light tracking-wider uppercase">Filters</h2>
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Price Range</label>
+                <select
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                  value={filters.priceRange}
+                  onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
+                >
+                  <option value="all">Any Price</option>
+                  <option value="0-500000">Under $500k</option>
+                  <option value="500000-1000000">$500k - $1M</option>
+                  <option value="1000000-2000000">$1M - $2M</option>
+                  <option value="2000000-999999999">$2M+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Bedrooms</label>
+                <select
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                  value={filters.beds}
+                  onChange={(e) => setFilters({ ...filters, beds: e.target.value })}
+                >
+                  <option value="all">Any Beds</option>
+                  <option value="1">1+ Beds</option>
+                  <option value="2">2+ Beds</option>
+                  <option value="3">3+ Beds</option>
+                  <option value="4">4+ Beds</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Bathrooms</label>
+                <select
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                  value={filters.baths}
+                  onChange={(e) => setFilters({ ...filters, baths: e.target.value })}
+                >
+                  <option value="all">Any Baths</option>
+                  <option value="1">1+ Baths</option>
+                  <option value="2">2+ Baths</option>
+                  <option value="3">3+ Baths</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Property Type</label>
+                <select
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                  value={filters.type}
+                  onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                >
+                  <option value="all">Any Type</option>
+                  <option value="house">House</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="townhouse">Townhouse</option>
+                </select>
+              </div>
+
+              <div className="flex gap-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    setFilters({
+                      priceRange: 'all',
+                      beds: 'all',
+                      baths: 'all',
+                      type: 'all'
+                    });
+                    setMobileFiltersOpen(false);
+                  }}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-600 font-light tracking-wider hover:bg-gray-50 transition-all duration-300"
+                >
+                  Reset
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="flex-1 px-4 py-3 bg-navy text-white font-light tracking-wider uppercase hover:bg-charcoal transition-all duration-300"
+                >
+                  Apply
+                </motion.button>
+              </div>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
 
       {/* Listing Detail Modal */}
       <Dialog
