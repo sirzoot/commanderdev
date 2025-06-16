@@ -1,71 +1,164 @@
-import { motion, useScroll, useTransform, useInView, useMotionValueEvent, useAnimationControls, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
+import { useLenis } from '../ui/lenis_provider';
 
-const PropertyCard = ({ listing, index, totalListings, isActive, xOffset }) => {
+const PropertyCard = ({ listing, index, isActive, scrollProgress }) => {
   const cardRef = useRef(null);
-  const isInView = useInView(cardRef, { once: true, amount: 0.5 });
   const [isHovered, setIsHovered] = useState(false);
+  const isInView = useInView(cardRef, { once: true, amount: 0.3 });
 
-  const imageParallax = useTransform(xOffset, [-500, 500], [-50, 50]);
+  // Advanced parallax and 3D effects
+  const rotateY = useTransform(scrollProgress, [0, 1], [0, 360]);
+  const scale = useTransform(scrollProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
+  
+  // Staggered animation delays
+  const animationDelay = index * 0.15;
 
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 100, rotateX: -15 }}
-      animate={isInView ? {
-        opacity: 1,
-        y: 0,
+      initial={{ 
+        opacity: 0, 
+        y: 100, 
+        rotateX: -15,
+        scale: 0.9
+      }}
+      animate={isInView ? { 
+        opacity: 1, 
+        y: 0, 
         rotateX: 0,
-        scale: isHovered ? 1.05 : 1,
-        rotateY: isHovered ? 5 : 0,
-        z: isHovered ? 50 : 0
+        scale: 1
       } : {}}
-      transition={{ duration: 0.8, ease: "easeOut", delay: index * 0.1 }}
+      whileHover={{
+        scale: 1.05,
+        rotateY: 5,
+        z: 50,
+        transition: { duration: 0.3 }
+      }}
+      transition={{ 
+        duration: 0.8, 
+        ease: "easeOut", 
+        delay: animationDelay 
+      }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      style={{ transformStyle: "preserve-3d" }}
-      className={`relative w-[90vw] md:w-[70vw] lg:w-[600px] xl:w-[700px] 2xl:w-[800px] h-[400px] md:h-[450px] lg:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden shadow-xl ${
-        isActive ? 'z-20 scale-105' : 'z-10 scale-95'
+      style={{ 
+        transformStyle: "preserve-3d",
+        transformPerspective: 1000
+      }}
+      className={`relative w-[350px] md:w-[400px] lg:w-[450px] h-[500px] md:h-[550px] flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl cursor-pointer group ${
+        isActive ? 'z-20' : 'z-10'
       } transition-all duration-300 transform-gpu`}
     >
-      <motion.div
+      {/* Enhanced Image with Multiple Layers */}
+      <motion.div 
         className="absolute inset-0"
-        style={{ x: imageParallax }}
+        animate={{
+          scale: isHovered ? 1.1 : 1,
+        }}
+        transition={{ duration: 0.6 }}
       >
         <img
           src={listing.image}
           alt={listing.title}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        
+        {/* Dynamic Gradient Overlay */}
+        <motion.div 
+          className="absolute inset-0"
+          animate={{
+            background: isHovered 
+              ? "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%)"
+              : "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)"
+          }}
+          transition={{ duration: 0.3 }}
+        />
+        
+        {/* Hover Shine Effect */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          initial={{ x: '-100%', skewX: -25 }}
+          animate={isHovered ? { x: '100%' } : { x: '-100%' }}
+          transition={{ duration: 0.6 }}
+        />
       </motion.div>
 
+      {/* Content */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
         className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: animationDelay + 0.3 }}
       >
-        <h3 className="text-2xl md:text-3xl font-light mb-2">{listing.title}</h3>
-        <p className="text-lg md:text-xl font-light mb-3">{listing.location}</p>
-        <div className="flex gap-6 mb-3">
-          <div>
-            <span className="text-xl md:text-2xl font-light">{listing.beds}</span>
-            <span className="ml-2 text-sm md:text-base">Beds</span>
+        <motion.h3 
+          className="text-2xl md:text-3xl font-light mb-3"
+          animate={{
+            y: isHovered ? -5 : 0
+          }}
+        >
+          {listing.title}
+        </motion.h3>
+        
+        <motion.p 
+          className="text-lg md:text-xl font-light mb-4 opacity-90"
+          animate={{
+            y: isHovered ? -5 : 0
+          }}
+          transition={{ delay: 0.1 }}
+        >
+          {listing.location}
+        </motion.p>
+        
+        <motion.div 
+          className="flex gap-6 mb-4"
+          animate={{
+            y: isHovered ? -5 : 0
+          }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="text-center">
+            <span className="text-2xl md:text-3xl font-light block">{listing.beds}</span>
+            <span className="text-sm md:text-base opacity-80">Beds</span>
           </div>
-          <div>
-            <span className="text-xl md:text-2xl font-light">{listing.baths}</span>
-            <span className="ml-2 text-sm md:text-base">Baths</span>
+          <div className="text-center">
+            <span className="text-2xl md:text-3xl font-light block">{listing.baths}</span>
+            <span className="text-sm md:text-base opacity-80">Baths</span>
           </div>
-        </div>
-        <p className="text-2xl md:text-3xl font-light mb-4">${listing.price.toLocaleString()}</p>
+        </motion.div>
+        
+        <motion.p 
+          className="text-3xl md:text-4xl font-light mb-6"
+          animate={{
+            y: isHovered ? -5 : 0,
+            scale: isHovered ? 1.05 : 1
+          }}
+          transition={{ delay: 0.3 }}
+        >
+          ${listing.price.toLocaleString()}
+        </motion.p>
+        
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="px-6 py-2 bg-white text-black font-light tracking-wider uppercase text-sm hover:bg-gray-100 transition-all duration-300"
+          animate={{
+            y: isHovered ? -5 : 0,
+            opacity: isHovered ? 1 : 0.8
+          }}
+          className="px-8 py-3 bg-white text-gray-900 font-medium tracking-wider uppercase text-sm hover:bg-gray-100 transition-all duration-300 rounded-lg shadow-lg"
         >
-          View Property
+          View Details
         </motion.button>
+      </motion.div>
+
+      {/* Premium Badge */}
+      <motion.div
+        className="absolute top-4 right-4 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium uppercase tracking-wider"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: animationDelay + 0.5 }}
+      >
+        Featured
       </motion.div>
     </motion.div>
   );
@@ -73,15 +166,16 @@ const PropertyCard = ({ listing, index, totalListings, isActive, xOffset }) => {
 
 const FeaturedListings = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const containerRef = useRef(null);
   const sectionRef = useRef(null);
-  const x = useMotionValue(0);
-  const controls = useAnimationControls();
-  const isInView = useInView(sectionRef, { amount: 0.5 });
+  const containerRef = useRef(null);
+  const lenis = useLenis();
+  
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
   });
+
+  const isInView = useInView(sectionRef, { amount: 0.3 });
 
   const listings = [
     {
@@ -118,156 +212,138 @@ const FeaturedListings = () => {
     }
   ];
 
-  // Scroll-driven carousel
+  // Scroll-driven carousel with enhanced easing
   const carouselProgress = useTransform(scrollYProgress, [0.2, 0.8], [0, 1]);
   const carouselX = useTransform(
     carouselProgress,
     [0, 1],
-    [0, -(listings.length - 1) * (800 + 32)] // cardWidth + gap
+    [0, -(listings.length - 1) * 500] // Adjusted spacing
   );
 
-  // Smooth scroll to center when section comes into view
+  // Background parallax
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+
+  // Auto-advance carousel
   useEffect(() => {
-    if (isInView) {
-      const scrollToCenter = () => {
-        const section = sectionRef.current;
-        if (section) {
-          const rect = section.getBoundingClientRect();
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const targetScroll = scrollTop + rect.top - (window.innerHeight - rect.height) / 2;
-          
-          window.scrollTo({
-            top: targetScroll,
-            behavior: 'smooth'
-          });
-        }
-      };
-
-      const timeoutId = setTimeout(scrollToCenter, 100);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isInView]);
-
-  // Calculate the x position for the current index
-  const updateCarouselPosition = () => {
-    if (containerRef.current) {
-      const cardWidth = containerRef.current.querySelector('.flex-shrink-0')?.offsetWidth || 0;
-      const gap = 32;
-      const centerOffset = (window.innerWidth - cardWidth) / 2;
-      const targetX = -currentIndex * (cardWidth + gap) + centerOffset;
-      controls.start({ x: targetX, transition: { type: "spring", stiffness: 100, damping: 20 } });
-    }
-  };
-
-  useEffect(() => {
-    updateCarouselPosition();
-    window.addEventListener('resize', updateCarouselPosition);
-    return () => window.removeEventListener('resize', updateCarouselPosition);
-  }, [currentIndex]);
-
-  const handleDragEnd = (event, info) => {
-    const slider = containerRef.current.querySelector('.flex');
-    if (!slider) return;
-
-    const cardWidth = slider.querySelector('.flex-shrink-0')?.offsetWidth || 0;
-    const gap = 32;
-    const totalCardWidth = cardWidth + gap;
-
-    const currentOffset = x.get();
-    const snappedIndex = Math.round((currentOffset - (window.innerWidth - cardWidth) / 2) / -totalCardWidth);
+    if (!isInView) return;
     
-    let newIndex = Math.max(0, Math.min(listings.length - 1, snappedIndex));
-    setCurrentIndex(newIndex);
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % listings.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isInView, listings.length]);
+
+  const handleCardClick = (index) => {
+    setCurrentIndex(index);
+    if (lenis) {
+      // Smooth scroll to center the clicked card
+      const cardElement = containerRef.current?.children[index];
+      if (cardElement) {
+        lenis.scrollTo(cardElement, {
+          duration: 1,
+          offset: -window.innerHeight / 2
+        });
+      }
+    }
   };
 
   return (
     <section 
       ref={sectionRef}
       id="featured-listings" 
-      className="relative bg-gradient-to-b from-white via-gray-50 to-white py-12 md:py-16 overflow-hidden"
+      className="relative bg-gradient-to-b from-gray-50 via-white to-gray-50 py-20 md:py-32 overflow-hidden"
     >
-      <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10 mix-blend-multiply" />
-      
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.3 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative max-w-7xl mx-auto px-4 text-center mb-8 md:mb-12"
+      {/* Animated Background Pattern */}
+      <motion.div 
+        className="absolute inset-0 opacity-5"
+        style={{ y: backgroundY }}
       >
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-wider uppercase mb-3 text-black">
-          Featured Properties
-        </h2>
-        <p className="text-xl font-light text-gray-600">
-          Discover our handpicked selection of exceptional homes
-        </p>
+        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat" />
       </motion.div>
 
-      <div className="relative w-full h-[450px] md:h-[500px] flex items-center justify-center">
+      {/* Section Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative max-w-7xl mx-auto px-4 text-center mb-16 md:mb-24"
+      >
+        <motion.h2 
+          className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-wider uppercase mb-6 text-gray-900"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          Featured Properties
+        </motion.h2>
+        
+        <motion.p 
+          className="text-xl md:text-2xl font-light text-gray-600 max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          Discover our handpicked selection of exceptional homes, each showcased to perfection
+        </motion.p>
+      </motion.div>
+
+      {/* Enhanced Carousel */}
+      <div className="relative w-full">
         <motion.div
           ref={containerRef}
-          className="flex cursor-grab active:cursor-grabbing"
+          className="flex gap-8 px-8"
           style={{ x: carouselX }}
-          animate={controls}
           drag="x"
-          dragConstraints={{ left: -(listings.length - 1) * 832, right: 0 }}
-          onDragEnd={handleDragEnd}
-          onUpdate={(latest) => x.set(latest.x)}
-          whileHover={{ scale: 1.01 }}
-          transition={{ type: "spring", stiffness: 100, damping: 20 }}
+          dragConstraints={{ left: -(listings.length - 1) * 500, right: 0 }}
+          dragElastic={0.1}
+          whileDrag={{ cursor: "grabbing" }}
         >
           {listings.map((listing, index) => (
-            <PropertyCard
-              key={index}
-              listing={listing}
-              isActive={index === currentIndex}
-              index={index}
-              totalListings={listings.length}
-              xOffset={x}
-            />
+            <div key={index} onClick={() => handleCardClick(index)}>
+              <PropertyCard
+                listing={listing}
+                index={index}
+                isActive={index === currentIndex}
+                scrollProgress={scrollYProgress}
+              />
+            </div>
           ))}
         </motion.div>
 
-        <motion.button
-          onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
-          className="absolute left-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm flex items-center justify-center border border-white/20"
-          whileHover={{ scale: 1.1, backgroundColor: "rgba(0,0,0,0.1)" }}
-          whileTap={{ scale: 0.95 }}
-          disabled={currentIndex === 0}
-        >
-          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </motion.button>
-
-        <motion.button
-          onClick={() => setCurrentIndex(Math.min(listings.length - 1, currentIndex + 1))}
-          className="absolute right-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm flex items-center justify-center border border-white/20"
-          whileHover={{ scale: 1.1, backgroundColor: "rgba(0,0,0,0.1)" }}
-          whileTap={{ scale: 0.95 }}
-          disabled={currentIndex === listings.length - 1}
-        >
-          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </motion.button>
+        {/* Enhanced Navigation */}
+        <div className="flex justify-center mt-12 gap-3">
+          {listings.map((_, index) => (
+            <motion.button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                currentIndex === index ? 'bg-gray-900 scale-125' : 'bg-gray-400'
+              }`}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="flex justify-center mt-12 gap-4">
-        {listings.map((_, index) => (
-          <motion.button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-              currentIndex === index ? 'bg-black' : 'bg-black/40'
-            }`}
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-          />
-        ))}
-      </div>
+      {/* Floating Action Button */}
+      <motion.button
+        className="fixed bottom-8 right-8 w-16 h-16 bg-gray-900 text-white rounded-full shadow-2xl z-50 flex items-center justify-center"
+        whileHover={{ scale: 1.1, rotate: 90 }}
+        whileTap={{ scale: 0.9 }}
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </motion.button>
     </section>
   );
 };
 
-export default FeaturedListings; 
+export default FeaturedListings;
+
