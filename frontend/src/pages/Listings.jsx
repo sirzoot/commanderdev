@@ -5,45 +5,61 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const ListingCard = ({ listing, onClick, size = 'normal' }) => {
   const cardClasses = {
-    normal: 'col-span-1 row-span-1',
-    wide: 'col-span-2 row-span-1',
-    tall: 'col-span-1 row-span-2',
-    full: 'col-span-2 row-span-2'
+    normal: 'col-span-4 row-span-1',
+    wide: 'col-span-8 row-span-1',
+    tall: 'col-span-4 row-span-2',
+    full: 'col-span-8 row-span-2',
+    featured: 'col-span-12 row-span-2'
   };
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
       className={`relative group cursor-pointer ${cardClasses[size]} h-full`}
       onClick={() => onClick(listing)}
     >
       <div className="relative overflow-hidden rounded-lg h-full">
-        <img
+        <motion.img
           src={listing.image}
           alt={listing.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/40 to-transparent opacity-0 group-hover:opacity-100"
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        />
       </div>
       
-      <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-        <h3 className="text-xl font-light tracking-wider uppercase mb-1">{listing.title}</h3>
-        <p className="text-2xl font-light mb-2">${listing.price.toLocaleString()}</p>
-        <div className="flex gap-4 text-sm font-light tracking-wider">
+      <motion.div 
+        className="absolute bottom-0 left-0 right-0 p-6 text-white transform translate-y-4 group-hover:translate-y-0"
+        initial={{ opacity: 0, y: 20 }}
+        whileHover={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <h3 className="text-2xl font-light tracking-wider uppercase mb-2">{listing.title}</h3>
+        <p className="text-3xl font-light mb-3">${listing.price.toLocaleString()}</p>
+        <div className="flex gap-6 text-sm font-light tracking-wider mb-4">
           <span>{listing.beds} beds</span>
           <span>{listing.baths} baths</span>
+          <span className="capitalize">{listing.type}</span>
         </div>
         <motion.button
           initial={{ opacity: 0, y: 10 }}
-          whileHover={{ opacity: 1, y: 0 }}
-          className="mt-4 px-6 py-2 bg-white text-charcoal text-sm font-light tracking-wider uppercase hover:bg-opacity-90 transition-all duration-300"
+          whileHover={{ opacity: 1, y: 0, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="px-8 py-3 bg-white text-charcoal text-sm font-light tracking-wider uppercase hover:bg-opacity-90 transition-all duration-300"
         >
           View Details
         </motion.button>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
@@ -54,9 +70,65 @@ const Listings = () => {
     priceRange: 'all',
     beds: 'all',
     baths: 'all',
-    type: 'all'
+    type: 'all',
+    location: 'all'
   });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState(null);
+
+  const locations = [
+    'Vienna',
+    'McLean',
+    'Falls Church',
+    'Springfield',
+    'Alexandria',
+    'Woodbridge',
+    'Rixeyville'
+  ];
+
+  const FilterButton = ({ label, value, options, onChange }) => (
+    <div className="relative">
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => setActiveFilter(activeFilter === label ? null : label)}
+        className={`px-6 py-3 rounded-full text-sm font-light tracking-wider uppercase transition-all duration-300 ${
+          activeFilter === label 
+            ? 'bg-navy text-white' 
+            : 'bg-white/10 text-navy hover:bg-white/20'
+        }`}
+      >
+        {label}
+      </motion.button>
+      
+      <AnimatePresence>
+        {activeFilter === label && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl p-4 z-50"
+          >
+            {options.map((option) => (
+              <motion.button
+                key={option.value}
+                whileHover={{ x: 5 }}
+                onClick={() => {
+                  onChange(option.value);
+                  setActiveFilter(null);
+                }}
+                className={`w-full text-left px-4 py-2 text-sm font-light tracking-wider ${
+                  value === option.value ? 'text-navy' : 'text-gray-600'
+                }`}
+              >
+                {option.label}
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 
   const listings = [
     {
@@ -179,20 +251,99 @@ const Listings = () => {
     if (filters.beds !== 'all' && listing.beds < Number(filters.beds)) return false;
     if (filters.baths !== 'all' && listing.baths < Number(filters.baths)) return false;
     if (filters.type !== 'all' && listing.type !== filters.type) return false;
+    if (filters.location !== 'all' && listing.location !== filters.location) return false;
     return true;
   });
 
   return (
     <div className="min-h-screen pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="sticky top-16 z-30 bg-white/95 backdrop-blur-sm rounded-full shadow-lg p-4 mb-8 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-4">
+            <FilterButton
+              label="Price"
+              value={filters.priceRange}
+              options={[
+                { value: 'all', label: 'Any Price' },
+                { value: '0-500000', label: 'Under $500k' },
+                { value: '500000-1000000', label: '$500k - $1M' },
+                { value: '1000000-2000000', label: '$1M - $2M' },
+                { value: '2000000-999999999', label: '$2M+' }
+              ]}
+              onChange={(value) => setFilters({ ...filters, priceRange: value })}
+            />
+            <FilterButton
+              label="Beds"
+              value={filters.beds}
+              options={[
+                { value: 'all', label: 'Any Beds' },
+                { value: '1', label: '1+ Beds' },
+                { value: '2', label: '2+ Beds' },
+                { value: '3', label: '3+ Beds' },
+                { value: '4', label: '4+ Beds' }
+              ]}
+              onChange={(value) => setFilters({ ...filters, beds: value })}
+            />
+            <FilterButton
+              label="Baths"
+              value={filters.baths}
+              options={[
+                { value: 'all', label: 'Any Baths' },
+                { value: '1', label: '1+ Baths' },
+                { value: '2', label: '2+ Baths' },
+                { value: '3', label: '3+ Baths' }
+              ]}
+              onChange={(value) => setFilters({ ...filters, baths: value })}
+            />
+            <FilterButton
+              label="Type"
+              value={filters.type}
+              options={[
+                { value: 'all', label: 'Any Type' },
+                { value: 'house', label: 'House' },
+                { value: 'apartment', label: 'Apartment' },
+                { value: 'townhouse', label: 'Townhouse' }
+              ]}
+              onChange={(value) => setFilters({ ...filters, type: value })}
+            />
+            <FilterButton
+              label="Location"
+              value={filters.location}
+              options={[
+                { value: 'all', label: 'Any Location' },
+                ...locations.map(loc => ({ value: loc, label: loc }))
+              ]}
+              onChange={(value) => setFilters({ ...filters, location: value })}
+            />
+          </div>
+          
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setFilters({
+              priceRange: 'all',
+              beds: 'all',
+              baths: 'all',
+              type: 'all',
+              location: 'all'
+            })}
+            className="px-6 py-3 text-sm font-light tracking-wider uppercase text-gray-600 hover:text-navy transition-colors duration-300"
+          >
+            Reset
+          </motion.button>
+        </motion.div>
+
         <div className="flex gap-8">
-          {/* Gallery */}
           <div className="flex-1">
             <motion.div
               layout
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full"
+              className="grid grid-cols-12 gap-4 h-full"
               style={{
-                gridAutoRows: 'minmax(250px, 1fr)',
+                gridAutoRows: 'minmax(300px, 1fr)',
                 gridAutoFlow: 'dense'
               }}
             >
@@ -209,7 +360,6 @@ const Listings = () => {
             </motion.div>
           </div>
 
-          {/* Filters Panel */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -296,7 +446,6 @@ const Listings = () => {
         </div>
       </div>
 
-      {/* Mobile Filters Button */}
       <div className="lg:hidden fixed bottom-6 right-6 z-40">
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -308,7 +457,6 @@ const Listings = () => {
         </motion.button>
       </div>
 
-      {/* Mobile Filters Modal */}
       <Dialog
         open={mobileFiltersOpen}
         onClose={() => setMobileFiltersOpen(false)}
@@ -418,7 +566,6 @@ const Listings = () => {
         </div>
       </Dialog>
 
-      {/* Listing Detail Modal */}
       <Dialog
         open={!!selectedListing}
         onClose={() => setSelectedListing(null)}

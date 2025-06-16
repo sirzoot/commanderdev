@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useScroll, useSpring } from 'framer-motion';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   return (
@@ -50,6 +50,31 @@ const Hero = () => {
   const [isSellModalOpen, setIsSellModalOpen] = useState(false);
   const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+
+  // Create spring animation for smoother transitions
+  const y = useSpring(0, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  // Transform scroll progress to y position with a sharper fade
+  const yTransform = useTransform(scrollYProgress, [0, 0.2], [0, -100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.15], [1, 0.95]);
+
+  // Update spring value when scroll changes
+  useEffect(() => {
+    const unsubscribe = yTransform.onChange((latest) => {
+      y.set(latest);
+    });
+    return () => unsubscribe();
+  }, [yTransform, y]);
 
   const slides = [
     {
@@ -169,7 +194,15 @@ const Hero = () => {
   };
 
   return (
-    <div className="hero-section relative min-h-[100vh] w-full overflow-hidden">
+    <motion.div 
+      ref={heroRef}
+      style={{ 
+        y,
+        opacity,
+        scale
+      }}
+      className="hero-section relative min-h-[100vh] w-full overflow-hidden"
+    >
       {/* Background Slideshow */}
       <div className="absolute inset-0">
         {/* Current Slide */}
@@ -207,7 +240,12 @@ const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative min-h-[100vh] flex flex-col items-center justify-center text-white px-4 py-16 md:py-0">
+      <motion.div 
+        className="relative min-h-[100vh] flex flex-col items-center justify-center text-white px-4 py-16 md:py-0"
+        style={{
+          y: useTransform(scrollYProgress, [0, 1], [0, -50])
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -248,13 +286,16 @@ const Hero = () => {
             </MagneticButton>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 1 }}
+        style={{
+          opacity: useTransform(scrollYProgress, [0, 0.3], [1, 0])
+        }}
         className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2"
       >
         <div className="w-6 h-10 border border-white/30 rounded-full flex justify-center">
@@ -376,7 +417,7 @@ const Hero = () => {
           </motion.button>
         </form>
       </Modal>
-    </div>
+    </motion.div>
   );
 };
 

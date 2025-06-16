@@ -1,99 +1,86 @@
-import { motion, useScroll, useTransform, useInView, useMotionValueEvent } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { motion, useScroll, useTransform, useInView, useMotionValueEvent, useAnimationControls, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 
-const PropertyShowcase = ({ listing, index, totalListings }) => {
-  const containerRef = useRef(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.5 });
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
+const PropertyCard = ({ listing, index, totalListings, isActive, xOffset }) => {
+  const cardRef = useRef(null);
+  const isInView = useInView(cardRef, { once: true, amount: 0.5 });
+  const [isHovered, setIsHovered] = useState(false);
 
-  const imageParallaxY = useTransform(scrollYProgress, [0, 1], [0, -50]);
+  const imageParallax = useTransform(xOffset, [-500, 500], [-50, 50]);
 
   return (
     <motion.div
-      ref={containerRef}
-      initial={{ opacity: 0, y: 100 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="relative min-h-[60vh] w-full flex items-start justify-center py-8 md:py-12"
+      ref={cardRef}
+      initial={{ opacity: 0, y: 100, rotateX: -15 }}
+      animate={isInView ? {
+        opacity: 1,
+        y: 0,
+        rotateX: 0,
+        scale: isHovered ? 1.05 : 1,
+        rotateY: isHovered ? 5 : 0,
+        z: isHovered ? 50 : 0
+      } : {}}
+      transition={{ duration: 0.8, ease: "easeOut", delay: index * 0.1 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      style={{ transformStyle: "preserve-3d" }}
+      className={`relative w-[90vw] md:w-[70vw] lg:w-[600px] xl:w-[700px] 2xl:w-[800px] h-[400px] md:h-[450px] lg:h-[500px] flex-shrink-0 rounded-2xl overflow-hidden shadow-xl ${
+        isActive ? 'z-20 scale-105' : 'z-10 scale-95'
+      } transition-all duration-300 transform-gpu`}
     >
-      <div className="w-full max-w-[1200px] 2xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8 lg:gap-12 items-center`}>
-          {/* Image Section */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="w-full lg:w-3/5 relative aspect-[16/9] rounded-lg overflow-hidden"
-          >
-            <motion.div
-              style={{ y: imageParallaxY }}
-              className="absolute inset-0"
-            >
-              <img
-                src={listing.image}
-                alt={listing.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent" />
-            </motion.div>
-          </motion.div>
+      <motion.div
+        className="absolute inset-0"
+        style={{ x: imageParallax }}
+      >
+        <img
+          src={listing.image}
+          alt={listing.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      </motion.div>
 
-          {/* Content Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="w-full lg:w-2/5 text-charcoal"
-          >
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl 2xl:text-5xl font-light tracking-wider uppercase mb-2">
-                  {listing.title}
-                </h2>
-                <p className="text-lg sm:text-xl lg:text-2xl font-light text-charcoal">
-                  {listing.location}
-                </p>
-              </div>
-
-              <div className="flex gap-8 text-base sm:text-lg lg:text-xl">
-                <div>
-                  <span className="font-light tracking-wider">{listing.beds}</span>
-                  <span className="text-charcoal ml-2">Beds</span>
-                </div>
-                <div>
-                  <span className="font-light tracking-wider">{listing.baths}</span>
-                  <span className="text-charcoal ml-2">Baths</span>
-                </div>
-              </div>
-
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-light">
-                ${listing.price.toLocaleString()}
-              </p>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full px-6 sm:px-8 py-3 sm:py-4 border border-black text-black font-light tracking-wider uppercase text-sm hover:bg-gray-100 transition-all duration-300"
-              >
-                View Property
-              </motion.button>
-            </div>
-          </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white"
+      >
+        <h3 className="text-2xl md:text-3xl font-light mb-2">{listing.title}</h3>
+        <p className="text-lg md:text-xl font-light mb-3">{listing.location}</p>
+        <div className="flex gap-6 mb-3">
+          <div>
+            <span className="text-xl md:text-2xl font-light">{listing.beds}</span>
+            <span className="ml-2 text-sm md:text-base">Beds</span>
+          </div>
+          <div>
+            <span className="text-xl md:text-2xl font-light">{listing.baths}</span>
+            <span className="ml-2 text-sm md:text-base">Baths</span>
+          </div>
         </div>
-      </div>
+        <p className="text-2xl md:text-3xl font-light mb-4">${listing.price.toLocaleString()}</p>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-2 bg-white text-black font-light tracking-wider uppercase text-sm hover:bg-gray-100 transition-all duration-300"
+        >
+          View Property
+        </motion.button>
+      </motion.div>
     </motion.div>
   );
 };
 
 const FeaturedListings = () => {
-  const [showFloatingButton, setShowFloatingButton] = useState(false);
-  const { scrollYProgress } = useScroll();
-
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setShowFloatingButton(latest > 0.2 && latest < 0.7);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
+  const x = useMotionValue(0);
+  const controls = useAnimationControls();
+  const isInView = useInView(sectionRef, { amount: 0.5 });
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
   });
 
   const listings = [
@@ -131,157 +118,153 @@ const FeaturedListings = () => {
     }
   ];
 
-  // Responsive CTA width for padding
-  const ctaPadding = 'pr-0 sm:pr-[240px] xl:pr-[390px]';
+  // Scroll-driven carousel
+  const carouselProgress = useTransform(scrollYProgress, [0.2, 0.8], [0, 1]);
+  const carouselX = useTransform(
+    carouselProgress,
+    [0, 1],
+    [0, -(listings.length - 1) * (800 + 32)] // cardWidth + gap
+  );
+
+  // Smooth scroll to center when section comes into view
+  useEffect(() => {
+    if (isInView) {
+      const scrollToCenter = () => {
+        const section = sectionRef.current;
+        if (section) {
+          const rect = section.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const targetScroll = scrollTop + rect.top - (window.innerHeight - rect.height) / 2;
+          
+          window.scrollTo({
+            top: targetScroll,
+            behavior: 'smooth'
+          });
+        }
+      };
+
+      const timeoutId = setTimeout(scrollToCenter, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isInView]);
+
+  // Calculate the x position for the current index
+  const updateCarouselPosition = () => {
+    if (containerRef.current) {
+      const cardWidth = containerRef.current.querySelector('.flex-shrink-0')?.offsetWidth || 0;
+      const gap = 32;
+      const centerOffset = (window.innerWidth - cardWidth) / 2;
+      const targetX = -currentIndex * (cardWidth + gap) + centerOffset;
+      controls.start({ x: targetX, transition: { type: "spring", stiffness: 100, damping: 20 } });
+    }
+  };
+
+  useEffect(() => {
+    updateCarouselPosition();
+    window.addEventListener('resize', updateCarouselPosition);
+    return () => window.removeEventListener('resize', updateCarouselPosition);
+  }, [currentIndex]);
+
+  const handleDragEnd = (event, info) => {
+    const slider = containerRef.current.querySelector('.flex');
+    if (!slider) return;
+
+    const cardWidth = slider.querySelector('.flex-shrink-0')?.offsetWidth || 0;
+    const gap = 32;
+    const totalCardWidth = cardWidth + gap;
+
+    const currentOffset = x.get();
+    const snappedIndex = Math.round((currentOffset - (window.innerWidth - cardWidth) / 2) / -totalCardWidth);
+    
+    let newIndex = Math.max(0, Math.min(listings.length - 1, snappedIndex));
+    setCurrentIndex(newIndex);
+  };
 
   return (
-    <section id="featured-listings" className="relative bg-white">
-      {/* Main Content Container */}
-      <div className={`relative w-full max-w-[1600px] 2xl:max-w-[1800px] mx-auto ${ctaPadding}`}>
-        {/* Floating CTA Sections */}
+    <section 
+      ref={sectionRef}
+      id="featured-listings" 
+      className="relative bg-gradient-to-b from-white via-gray-50 to-white py-12 md:py-16 overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10 mix-blend-multiply" />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="relative max-w-7xl mx-auto px-4 text-center mb-8 md:mb-12"
+      >
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-wider uppercase mb-3 text-black">
+          Featured Properties
+        </h2>
+        <p className="text-xl font-light text-gray-600">
+          Discover our handpicked selection of exceptional homes
+        </p>
+      </motion.div>
+
+      <div className="relative w-full h-[450px] md:h-[500px] flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ 
-            opacity: showFloatingButton ? 1 : 0,
-            x: showFloatingButton ? 0 : 100
-          }}
-          transition={{ 
-            duration: 0.3,
-            ease: "easeInOut"
-          }}
-          className="fixed inset-y-0 right-0 flex items-center justify-end z-50 w-[180px] sm:w-[220px] md:w-[240px] xl:w-[350px] p-3 sm:p-4 md:p-6 xl:p-8 bg-white/80 backdrop-blur rounded-l-lg shadow-xl border-l border-t border-b border-charcoal/10 hidden sm:flex"
-          style={{ pointerEvents: showFloatingButton ? 'auto' : 'none' }}
+          ref={containerRef}
+          className="flex cursor-grab active:cursor-grabbing"
+          style={{ x: carouselX }}
+          animate={controls}
+          drag="x"
+          dragConstraints={{ left: -(listings.length - 1) * 832, right: 0 }}
+          onDragEnd={handleDragEnd}
+          onUpdate={(latest) => x.set(latest.x)}
+          whileHover={{ scale: 1.01 }}
+          transition={{ type: "spring", stiffness: 100, damping: 20 }}
         >
-          <div className="flex flex-col gap-4 xl:gap-6 w-full max-h-[90vh] justify-center">
-            {/* View All Listings Card */}
-            <motion.div 
-              whileHover={{ 
-                scale: 1.02,
-                rotateX: 2,
-                rotateY: -2,
-                transition: { duration: 0.2 }
-              }}
-              className="bg-transparent shadow-none p-0"
-            >
-              <motion.h3 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-lg md:text-xl xl:text-2xl font-light tracking-wider uppercase text-charcoal mb-2 xl:mb-4"
-              >
-                Ready for More?
-              </motion.h3>
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-charcoal/80 font-light text-xs md:text-sm xl:text-base mb-2 xl:mb-4"
-              >
-                Explore our complete collection of premium properties
-              </motion.p>
-              <motion.button
-                whileHover={{ 
-                  scale: 1.02,
-                  backgroundColor: "#1a1a1a",
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full px-3 py-2 md:px-4 md:py-3 xl:px-6 xl:py-4 bg-charcoal text-white font-light tracking-wider uppercase text-xs md:text-sm hover:bg-charcoal/90 transition-all duration-300 rounded"
-              >
-                View All Listings
-              </motion.button>
-            </motion.div>
-
-            {/* Contact Card */}
-            <motion.div 
-              whileHover={{ 
-                scale: 1.02,
-                rotateX: 2,
-                rotateY: -2,
-                transition: { duration: 0.2 }
-              }}
-              className="bg-transparent shadow-none p-0"
-            >
-              <motion.h3 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-lg md:text-xl xl:text-2xl font-light tracking-wider uppercase text-charcoal mb-2 xl:mb-4"
-              >
-                Let's Connect
-              </motion.h3>
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-charcoal/80 font-light text-xs md:text-sm xl:text-base mb-2 xl:mb-4"
-              >
-                Ready to find your perfect home? Our experts are here to help.
-              </motion.p>
-              <motion.button
-                whileHover={{ 
-                  scale: 1.02,
-                  backgroundColor: "#f5f5f5",
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full px-3 py-2 md:px-4 md:py-3 xl:px-6 xl:py-4 bg-white text-charcoal font-light tracking-wider uppercase text-xs md:text-sm hover:bg-gray-50 transition-all duration-300 border border-charcoal/20 rounded"
-              >
-                Contact Us
-              </motion.button>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Section Header */}
-        <div className="min-h-[30vh] lg:min-h-[40vh] flex items-center justify-center py-8 lg:py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto px-4"
-          >
-            <h2 className="text-3xl sm:text-4xl lg:text-6xl 2xl:text-7xl font-light tracking-wider uppercase mb-4 lg:mb-6 text-charcoal">
-              Featured Properties
-            </h2>
-            <p className="text-lg sm:text-xl lg:text-2xl 2xl:text-3xl font-light tracking-wider text-charcoal">
-              Discover our handpicked selection of exceptional homes
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Property Showcases */}
-        <div className="max-w-[1200px] 2xl:max-w-[1400px] mx-auto">
           {listings.map((listing, index) => (
-            <PropertyShowcase
+            <PropertyCard
               key={index}
               listing={listing}
+              isActive={index === currentIndex}
               index={index}
               totalListings={listings.length}
+              xOffset={x}
             />
           ))}
-        </div>
+        </motion.div>
 
-        {/* Final CTA */}
-        <div className="min-h-[15vh] flex items-center justify-center py-8 lg:py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto px-4"
-          >
-            <h2 className="text-3xl sm:text-4xl lg:text-6xl 2xl:text-7xl font-light tracking-wider uppercase text-charcoal mb-6">
-              Find Your Dream Home
-            </h2>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 sm:px-12 py-3 sm:py-4 border border-black text-black font-light tracking-wider uppercase text-sm hover:bg-gray-100 transition-all duration-300"
-            >
-              View All Listings
-            </motion.button>
-          </motion.div>
-        </div>
+        <motion.button
+          onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
+          className="absolute left-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm flex items-center justify-center border border-white/20"
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(0,0,0,0.1)" }}
+          whileTap={{ scale: 0.95 }}
+          disabled={currentIndex === 0}
+        >
+          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </motion.button>
+
+        <motion.button
+          onClick={() => setCurrentIndex(Math.min(listings.length - 1, currentIndex + 1))}
+          className="absolute right-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-black/5 backdrop-blur-sm flex items-center justify-center border border-white/20"
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(0,0,0,0.1)" }}
+          whileTap={{ scale: 0.95 }}
+          disabled={currentIndex === listings.length - 1}
+        >
+          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </motion.button>
+      </div>
+
+      <div className="flex justify-center mt-12 gap-4">
+        {listings.map((_, index) => (
+          <motion.button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+              currentIndex === index ? 'bg-black' : 'bg-black/40'
+            }`}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+          />
+        ))}
       </div>
     </section>
   );

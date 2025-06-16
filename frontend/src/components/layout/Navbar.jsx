@@ -15,9 +15,6 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
-  const [isHeroInView, setIsHeroInView] = useState(true);
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
@@ -25,166 +22,125 @@ const Navbar = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setIsScrolled(currentScrollY > 50);
-
-      if (isHomePage) {
-        const hero = document.querySelector('.hero-section');
-        if (hero) {
-          const rect = hero.getBoundingClientRect();
-          // Only show navbar if the top of the hero is at or above the top of the viewport (i.e., user is at the very top)
-          setIsHeroInView(rect.top >= 0 && rect.bottom > window.innerHeight / 2);
-        }
-        if (currentScrollY > lastScrollY) {
-          setIsVisible(false);
-        } else {
-          setIsVisible(true);
-        }
-        setLastScrollY(currentScrollY);
-      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, isHomePage]);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowNavbar(true);
-    }, 1800);
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
   const customEase = [0.16, 1, 0.3, 1];
 
-  // Only show navbar if hero is in view (top of page)
-  const shouldShowNavbar = showNavbar && (!isHomePage || isHeroInView);
-
   return (
     <>
       <AnimatePresence>
-        {shouldShowNavbar && (
+        {showNavbar && (
           <motion.nav
-            initial={{ x: -100, opacity: 0 }}
-            animate={{ 
-              x: 0, 
-              opacity: 1,
-              height: isHomePage && !isVisible ? '0px' : '100vh'
-            }}
-            transition={{ duration: 0.5, ease: customEase }}
-            className={`fixed left-0 top-0 z-50 transition-all duration-200 overflow-hidden ${
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ duration: 0.6, ease: customEase }}
+            className={`fixed left-0 top-0 z-50 w-full transition-all duration-200 ${
               isHomePage 
                 ? (isScrolled ? 'bg-white/90 backdrop-blur-sm' : 'bg-transparent')
                 : 'bg-white/90 backdrop-blur-sm'
             }`}
           >
-            <div className="h-full flex flex-col justify-between py-12 px-8">
-              {/* Logo */}
-              <motion.div
-                initial={{ scale: 0.4, opacity: 0 }}
-                animate={{ 
-                  scale: 1, 
-                  opacity: isHomePage && !isVisible ? 0 : 1 
-                }}
-                transition={{ duration: 0.4, ease: customEase }}
-                className="mb-16"
-              >
-                <Link to="/" className="block">
-                  <img
-                    src="/images/Image Files/Image Files/logo.png"
-                    alt="TruView Real Estate"
-                    className={`h-12 transition-all duration-300 ${
-                      isHomePage && !isScrolled ? 'brightness-0 invert' : ''
-                    }`}
-                  />
-                </Link>
-              </motion.div>
-
-              {/* Navigation Links */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ 
-                  opacity: isHomePage && !isVisible ? 0 : 1, 
-                  y: 0 
-                }}
-                transition={{ duration: 0.4, delay: 0.1, ease: customEase }}
-                className="flex-1 flex flex-col justify-center space-y-8"
-              >
-                {navigation.map((item, index) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className="group relative"
-                  >
-                    <motion.div
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className={`text-2xl font-light tracking-wider uppercase transition-all duration-300 ${
-                        isHomePage && !isScrolled 
-                          ? 'text-white hover:text-white/80' 
-                          : 'text-gray-800 hover:text-gray-600'
-                      }`}
-                    >
-                      {item.name}
-                      {location.pathname === item.href && (
-                        <motion.div
-                          layoutId="activeNav"
-                          className="absolute -left-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-current"
-                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        />
-                      )}
-                    </motion.div>
-                  </Link>
-                ))}
-              </motion.div>
-
-              {/* CTA Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: isHomePage && !isVisible ? 0 : 1, 
-                  y: 0 
-                }}
-                transition={{ duration: 0.4, delay: 0.2, ease: customEase }}
-                className="mt-16"
-              >
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-full px-8 py-3 text-sm font-light tracking-wider uppercase transition-all duration-300 ${
-                    isHomePage && !isScrolled
-                      ? 'bg-white text-charcoal hover:bg-opacity-90'
-                      : 'bg-navy text-white hover:bg-gray-800'
-                  }`}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between h-20">
+                {/* Logo */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: customEase }}
                 >
-                  Get Estimate
-                </motion.button>
-              </motion.div>
+                  <Link to="/" className="block">
+                    <img
+                      src="/images/Image Files/Image Files/logo.png"
+                      alt="TruView Real Estate"
+                      className={`h-12 transition-all duration-300 ${
+                        isHomePage && !isScrolled ? 'brightness-0 invert' : ''
+                      }`}
+                    />
+                  </Link>
+                </motion.div>
+
+                {/* Desktop Navigation */}
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1, ease: customEase }}
+                  className="hidden md:flex items-center space-x-8"
+                >
+                  {navigation.map((item, index) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className="group relative"
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                        className={`text-sm font-light tracking-wider uppercase transition-all duration-300 ${
+                          isHomePage && !isScrolled 
+                            ? 'text-white hover:text-white/80' 
+                            : 'text-gray-800 hover:text-gray-600'
+                        }`}
+                      >
+                        {item.name}
+                        {location.pathname === item.href && (
+                          <motion.div
+                            layoutId="activeNav"
+                            className="absolute -bottom-1 left-0 w-full h-0.5 bg-current"
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                          />
+                        )}
+                      </motion.div>
+                    </Link>
+                  ))}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`px-6 py-2 text-sm font-light tracking-wider uppercase transition-all duration-300 ${
+                      isHomePage && !isScrolled
+                        ? 'bg-white text-charcoal hover:bg-opacity-90'
+                        : 'bg-navy text-white hover:bg-gray-800'
+                    }`}
+                  >
+                    Get Estimate
+                  </motion.button>
+                </motion.div>
+
+                {/* Mobile Menu Button */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="md:hidden"
+                >
+                  <button
+                    type="button"
+                    className={`inline-flex items-center justify-center p-2 rounded-md ${
+                      isHomePage && !isScrolled ? 'text-white' : 'text-gray-700'
+                    } hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500`}
+                    onClick={() => setMobileMenuOpen(true)}
+                  >
+                    <span className="sr-only">Open main menu</span>
+                    <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+                  </button>
+                </motion.div>
+              </div>
             </div>
           </motion.nav>
         )}
       </AnimatePresence>
-
-      {/* Mobile Menu Button */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ 
-          opacity: isHomePage && !isVisible ? 0 : 1, 
-          y: 0 
-        }}
-        transition={{ duration: 0.4, delay: 0.1, ease: customEase }}
-        className="md:hidden fixed top-4 right-4 z-50"
-      >
-        <button
-          type="button"
-          className={`inline-flex items-center justify-center p-2 rounded-md ${
-            isHomePage && !isScrolled ? 'text-white' : 'text-gray-700'
-          } hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500`}
-          onClick={() => setMobileMenuOpen(true)}
-        >
-          <span className="sr-only">Open main menu</span>
-          <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-        </button>
-      </motion.div>
 
       {/* Mobile Menu */}
       <Dialog

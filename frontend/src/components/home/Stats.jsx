@@ -118,9 +118,20 @@ const Stats = () => {
   };
 
   return (
-    <section id="stats" className="relative bg-white py-20">
+    <section 
+      id="stats" 
+      className="relative py-20"
+      style={{
+        backgroundImage: "url('/images/pattern.svg')",
+        backgroundRepeat: "repeat",
+        backgroundSize: "200px 200px", // Use the pattern's defined size
+        backgroundColor: "#f8f8f8", // Light background for contrast with pattern
+      }}
+    >
+      {/* Pattern Background Overlay (if needed for more subtle effect) */}
+      
       {/* Stats Section */}
-      <div ref={sectionRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+      <div ref={sectionRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
         <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
           {statsData.map((stat, index) => (
             <StatCard
@@ -139,7 +150,7 @@ const Stats = () => {
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="bg-white py-20 px-4 sm:px-6 lg:px-8"
+        className="relative z-10 py-20 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-2xl mx-auto">
           <motion.form

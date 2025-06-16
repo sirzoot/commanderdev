@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <!-- Main pattern -->
+    <pattern id="luxury-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+      <!-- Modern architectural grid -->
+      <g stroke="#1a365d" stroke-opacity="0.5">
+        <!-- Vertical lines -->
+        <path d="M40 0v200" stroke-width="2.5"/>
+        <path d="M80 0v200" stroke-width="2.5"/>
+        <path d="M120 0v200" stroke-width="2.5"/>
+        <path d="M160 0v200" stroke-width="2.5"/>
+        
+        <!-- Horizontal lines -->
+        <path d="M0 40h200" stroke-width="2.5"/>
+        <path d="M0 80h200" stroke-width="2.5"/>
+        <path d="M0 120h200" stroke-width="2.5"/>
+        <path d="M0 160h200" stroke-width="2.5"/>
+      </g>
+
+      <!-- Modern architectural elements -->
+      <g>
+        <!-- Diagonal accents in gold -->
+        <path d="M0 0l200 200" stroke="#b8860b" stroke-width="2" stroke-opacity="0.6"/>
+        <path d="M200 0l-200 200" stroke="#b8860b" stroke-width="2" stroke-opacity="0.6"/>
+        
+        <!-- Modern rectangles in navy -->
+        <rect x="60" y="60" width="80" height="80" fill="none" stroke="#1a365d" stroke-width="3" stroke-opacity="0.5"/>
+        <rect x="70" y="70" width="60" height="60" fill="none" stroke="#1a365d" stroke-width="2.5" stroke-opacity="0.55"/>
+        
+        <!-- Floating elements in gold -->
+        <circle cx="100" cy="100" r="30" fill="none" stroke="#b8860b" stroke-width="2.5" stroke-opacity="0.65"/>
+        <circle cx="100" cy="100" r="20" fill="none" stroke="#b8860b" stroke-width="2" stroke-opacity="0.6"/>
+        
+        <!-- Corner accents in charcoal -->
+        <path d="M0 0l40 0M0 0l0 40" stroke="#4a5568" stroke-width="3" stroke-opacity="0.45"/>
+        <path d="M200 0l-40 0M200 0l0 40" stroke="#4a5568" stroke-width="3" stroke-opacity="0.45"/>
+        <path d="M0 200l40 0M0 200l0 -40" stroke="#4a5568" stroke-width="3" stroke-opacity="0.45"/>
+        <path d="M200 200l-40 0M200 200l0 -40" stroke="#4a5568" stroke-width="3" stroke-opacity="0.45"/>
+      </g>
+
+      <!-- Subtle dots in navy -->
+      <g fill="#1a365d" fill-opacity="0.5">
+        <circle cx="100" cy="100" r="2.5"/>
+        <circle cx="40" cy="40" r="2.5"/>
+        <circle cx="160" cy="40" r="2.5"/>
+        <circle cx="40" cy="160" r="2.5"/>
+        <circle cx="160" cy="160" r="2.5"/>
+      </g>
+
+      <!-- Gold accent dots -->
+      <g fill="#b8860b" fill-opacity="0.65">
+        <circle cx="100" cy="50" r="3"/>
+        <circle cx="100" cy="150" r="3"/>
+        <circle cx="50" cy="100" r="3"/>
+        <circle cx="150" cy="100" r="3"/>
+      </g>
+    </pattern>
+  </defs>
+  
+  <!-- Apply pattern -->
+  <rect width="200" height="200" fill="url(#luxury-pattern)"/>
+</svg> 
