@@ -1,18 +1,10 @@
 import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
-import { useLenis } from '../ui/lenis_provider';
 
-const PropertyCard = ({ listing, index, isActive, scrollProgress }) => {
+const PropertyCard = ({ listing, index, isActive, onCardClick }) => {
   const cardRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
   const isInView = useInView(cardRef, { once: true, amount: 0.3 });
-
-  // Advanced parallax and 3D effects
-  const rotateY = useTransform(scrollProgress, [0, 1], [0, 360]);
-  const scale = useTransform(scrollProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
-  
-  // Staggered animation delays
-  const animationDelay = index * 0.15;
 
   return (
     <motion.div
@@ -30,31 +22,32 @@ const PropertyCard = ({ listing, index, isActive, scrollProgress }) => {
         scale: 1
       } : {}}
       whileHover={{
-        scale: 1.05,
-        rotateY: 5,
-        z: 50,
+        scale: 1.02,
+        rotateY: 2,
+        z: 20,
         transition: { duration: 0.3 }
       }}
       transition={{ 
         duration: 0.8, 
         ease: "easeOut", 
-        delay: animationDelay 
+        delay: index * 0.15
       }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      onClick={() => onCardClick(index)}
       style={{ 
         transformStyle: "preserve-3d",
         transformPerspective: 1000
       }}
       className={`relative w-[350px] md:w-[400px] lg:w-[450px] h-[500px] md:h-[550px] flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl cursor-pointer group ${
-        isActive ? 'z-20' : 'z-10'
+        isActive ? 'z-20 ring-4 ring-white/50' : 'z-10'
       } transition-all duration-300 transform-gpu`}
     >
       {/* Enhanced Image with Multiple Layers */}
       <motion.div 
         className="absolute inset-0"
         animate={{
-          scale: isHovered ? 1.1 : 1,
+          scale: isHovered ? 1.05 : 1,
         }}
         transition={{ duration: 0.6 }}
       >
@@ -89,7 +82,7 @@ const PropertyCard = ({ listing, index, isActive, scrollProgress }) => {
         className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: animationDelay + 0.3 }}
+        transition={{ delay: index * 0.15 + 0.3 }}
       >
         <motion.h3 
           className="text-2xl md:text-3xl font-light mb-3"
@@ -156,7 +149,7 @@ const PropertyCard = ({ listing, index, isActive, scrollProgress }) => {
         className="absolute top-4 right-4 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium uppercase tracking-wider"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: animationDelay + 0.5 }}
+        transition={{ delay: index * 0.15 + 0.5 }}
       >
         Featured
       </motion.div>
@@ -168,7 +161,7 @@ const FeaturedListings = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sectionRef = useRef(null);
   const containerRef = useRef(null);
-  const lenis = useLenis();
+  const [isDragging, setIsDragging] = useState(false);
   
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -212,66 +205,81 @@ const FeaturedListings = () => {
     }
   ];
 
-  // Scroll-driven carousel with enhanced easing
-  const carouselProgress = useTransform(scrollYProgress, [0.2, 0.8], [0, 1]);
-  const carouselX = useTransform(
-    carouselProgress,
-    [0, 1],
-    [0, -(listings.length - 1) * 500] // Adjusted spacing
-  );
+  // Fixed carousel positioning - no scroll interference
+  const cardWidth = 470; // Fixed width including gap
+  const centerOffset = typeof window !== 'undefined' ? (window.innerWidth - 450) / 2 : 0;
+  
+  const targetX = -currentIndex * cardWidth + centerOffset;
+  const x = useSpring(targetX, { 
+    stiffness: 300, 
+    damping: 30,
+    restDelta: 0.001
+  });
 
-  // Background parallax
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  // Update position when currentIndex changes
+  useEffect(() => {
+    if (!isDragging) {
+      x.set(targetX);
+    }
+  }, [currentIndex, targetX, x, isDragging]);
 
   // Auto-advance carousel
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || isDragging) return;
     
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % listings.length);
-    }, 4000);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [isInView, listings.length]);
+  }, [isInView, listings.length, isDragging]);
 
   const handleCardClick = (index) => {
     setCurrentIndex(index);
-    if (lenis) {
-      // Smooth scroll to center the clicked card
-      const cardElement = containerRef.current?.children[index];
-      if (cardElement) {
-        lenis.scrollTo(cardElement, {
-          duration: 1,
-          offset: -window.innerHeight / 2
-        });
+  };
+
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = (event, info) => {
+    setIsDragging(false);
+    
+    // Calculate which card should be active based on drag distance
+    const dragThreshold = 100;
+    if (Math.abs(info.offset.x) > dragThreshold) {
+      if (info.offset.x > 0 && currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      } else if (info.offset.x < 0 && currentIndex < listings.length - 1) {
+        setCurrentIndex(currentIndex + 1);
       }
     }
+  };
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : listings.length - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev < listings.length - 1 ? prev + 1 : 0));
   };
 
   return (
     <section 
       ref={sectionRef}
       id="featured-listings" 
-      className="relative bg-gradient-to-b from-gray-50 via-white to-gray-50 py-20 md:py-32 overflow-hidden"
+      className="relative bg-gradient-to-b from-white via-gray-50 to-white py-12 md:py-16 overflow-hidden"
     >
-      {/* Animated Background Pattern */}
-      <motion.div 
-        className="absolute inset-0 opacity-5"
-        style={{ y: backgroundY }}
-      >
-        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat" />
-      </motion.div>
-
       {/* Section Header */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative max-w-7xl mx-auto px-4 text-center mb-16 md:mb-24"
+        className="relative max-w-7xl mx-auto px-4 text-center mb-12 md:mb-16"
       >
         <motion.h2 
-          className="text-5xl sm:text-6xl lg:text-7xl font-light tracking-wider uppercase mb-6 text-gray-900"
+          className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-wider uppercase mb-6 text-gray-900"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -285,62 +293,77 @@ const FeaturedListings = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Discover our handpicked selection of exceptional homes, each showcased to perfection
+          Discover our handpicked selection of exceptional homes
         </motion.p>
       </motion.div>
 
-      {/* Enhanced Carousel */}
-      <div className="relative w-full">
+      {/* Fixed Carousel Container */}
+      <div className="relative w-full h-[600px] flex items-center justify-center">
         <motion.div
           ref={containerRef}
-          className="flex gap-8 px-8"
-          style={{ x: carouselX }}
+          className="flex gap-5 cursor-grab active:cursor-grabbing"
+          style={{ x }}
           drag="x"
-          dragConstraints={{ left: -(listings.length - 1) * 500, right: 0 }}
+          dragConstraints={{ 
+            left: -(listings.length - 1) * cardWidth, 
+            right: 0 
+          }}
           dragElastic={0.1}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
           whileDrag={{ cursor: "grabbing" }}
         >
           {listings.map((listing, index) => (
-            <div key={index} onClick={() => handleCardClick(index)}>
-              <PropertyCard
-                listing={listing}
-                index={index}
-                isActive={index === currentIndex}
-                scrollProgress={scrollYProgress}
-              />
-            </div>
+            <PropertyCard
+              key={index}
+              listing={listing}
+              index={index}
+              isActive={index === currentIndex}
+              onCardClick={handleCardClick}
+            />
           ))}
         </motion.div>
 
-        {/* Enhanced Navigation */}
-        <div className="flex justify-center mt-12 gap-3">
-          {listings.map((_, index) => (
-            <motion.button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                currentIndex === index ? 'bg-gray-900 scale-125' : 'bg-gray-400'
-              }`}
-              whileHover={{ scale: 1.2 }}
-              whileTap={{ scale: 0.9 }}
-            />
-          ))}
-        </div>
+        {/* Navigation Arrows */}
+        <motion.button
+          onClick={handlePrevious}
+          className="absolute left-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          disabled={currentIndex === 0}
+        >
+          <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </motion.button>
+
+        <motion.button
+          onClick={handleNext}
+          className="absolute right-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          disabled={currentIndex === listings.length - 1}
+        >
+          <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </motion.button>
       </div>
 
-      {/* Floating Action Button */}
-      <motion.button
-        className="fixed bottom-8 right-8 w-16 h-16 bg-gray-900 text-white rounded-full shadow-2xl z-50 flex items-center justify-center"
-        whileHover={{ scale: 1.1, rotate: 90 }}
-        whileTap={{ scale: 0.9 }}
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
-      </motion.button>
+      {/* Enhanced Navigation Dots */}
+      <div className="flex justify-center mt-8 gap-3">
+        {listings.map((_, index) => (
+          <motion.button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              currentIndex === index ? 'bg-gray-900 scale-125' : 'bg-gray-400'
+            }`}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+          />
+        ))}
+      </div>
     </section>
   );
 };

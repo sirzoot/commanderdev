@@ -1,240 +1,236 @@
-import { motion, useInView, useSpring, useTransform, useAnimation } from 'framer-motion';
-import { useRef, useEffect, useState } from 'react';
+import { motion, useInView, useTransform, useScroll } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 
-const StatCard = ({ number, label, delay, animationType }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
+const AnimatedCounter = ({ value, duration = 2000, suffix = "" }) => {
   const [count, setCount] = useState(0);
-  
-  useEffect(() => {
-    if (isInView) {
-      const target = parseInt(number);
-      const duration = 2000; // 2 seconds
-      const steps = 60; // 60fps
-      const increment = target / steps;
-      let current = 0;
-      
-      const interval = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-          setCount(target);
-          clearInterval(interval);
-        } else {
-          setCount(Math.floor(current));
-        }
-      }, duration / steps);
-      
-      return () => clearInterval(interval);
-    }
-  }, [isInView, number]);
+  const nodeRef = useRef();
+  const isInView = useInView(nodeRef, { once: true, amount: 0.5 });
 
-  const initialY = animationType === 'top' ? -50 : 50;
+  useEffect(() => {
+    if (!isInView) return;
+    
+    let startTime;
+    const startValue = 0;
+    const endValue = parseInt(value);
+    
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      
+      // Smooth easing
+      const easeOutQuart = 1 - Math.pow(1 - progress, 3);
+      const currentCount = Math.floor(startValue + (endValue - startValue) * easeOutQuart);
+      
+      setCount(currentCount);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, [isInView, value, duration]);
+
+  return (
+    <span ref={nodeRef}>
+      {count}{suffix}
+    </span>
+  );
+};
+
+const StatItem = ({ stat, index }) => {
+  const itemRef = useRef(null);
+  const isInView = useInView(itemRef, { once: true, amount: 0.6 });
 
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: initialY }}
+      ref={itemRef}
+      initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.8,
-        ease: "easeOut",
-        delay: delay, 
+      transition={{ 
+        duration: 0.8, 
+        delay: index * 0.15,
+        ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className="flex-1 text-center bg-gray-50 p-8 rounded-lg shadow-lg"
+      className="text-center group"
     >
-      <div className="max-w-4xl text-center mx-auto">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={isInView ? { scale: 1, opacity: 1 } : {}}
-          transition={{
-            duration: 0.8,
-            delay: delay + 0.2, 
-            ease: [0.18, 0.71, 0.11, 1]
-          }}
-          className="text-6xl md:text-8xl font-bold text-gray-900 mb-4"
-        >
-          {count}{number.includes('+') && '+'}
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{
-            duration: 0.5,
-            delay: delay + 0.4,
-            ease: [0.18, 0.71, 0.11, 1]
-          }}
-          className="text-xl md:text-2xl font-light tracking-wider uppercase text-gray-600"
-        >
-          {label}
-        </motion.div>
-      </div>
+      {/* Number */}
+      <motion.div 
+        className="mb-4"
+        initial={{ scale: 0.8 }}
+        animate={isInView ? { scale: 1 } : {}}
+        transition={{ delay: index * 0.15 + 0.3, duration: 0.6 }}
+      >
+        <h3 className="text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 mb-2">
+          <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+        </h3>
+      </motion.div>
+
+      {/* Label */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 1 } : {}}
+        transition={{ delay: index * 0.15 + 0.5, duration: 0.6 }}
+      >
+        <h4 className="text-lg md:text-xl font-medium text-gray-900 mb-2 tracking-wide uppercase">
+          {stat.label}
+        </h4>
+        <p className="text-sm md:text-base text-gray-600 font-light leading-relaxed max-w-xs mx-auto">
+          {stat.description}
+        </p>
+      </motion.div>
+
+      {/* Subtle underline */}
+      <motion.div
+        className="w-12 h-px bg-gray-300 mx-auto mt-4"
+        initial={{ scaleX: 0 }}
+        animate={isInView ? { scaleX: 1 } : {}}
+        transition={{ delay: index * 0.15 + 0.7, duration: 0.8 }}
+      />
     </motion.div>
   );
 };
 
 const Stats = () => {
-  const statsData = [
-    {
-      number: "500+",
-      label: "Homes Sold",
-      animationType: 'top'
-    },
-    {
-      number: "15",
-      label: "Years in Business",
-      animationType: 'bottom'
-    },
-    {
-      number: "21",
-      label: "Avg. Days on Market",
-      animationType: 'top'
-    },
-  ];
-
   const sectionRef = useRef(null);
-  const isSectionInView = useInView(sectionRef, { once: true, amount: 0.5 });
-  
-  const controls = useAnimation();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
 
-  useEffect(() => {
-    if (isSectionInView) {
-      controls.start({
-        scale: [1, 1.02, 1],
-        transition: {
-          duration: 2,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "easeInOut"
-        }
-      });
-    } else {
-      controls.stop();
+  // Subtle parallax effect
+  const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
+
+  const stats = [
+    {
+      value: "500",
+      suffix: "+",
+      label: "Homes Sold",
+      description: "Successfully closed transactions with satisfied clients"
+    },
+    {
+      value: "15",
+      suffix: "+",
+      label: "Years Experience",
+      description: "Dedicated expertise in luxury real estate markets"
+    },
+    {
+      value: "98",
+      suffix: "%",
+      label: "Client Satisfaction",
+      description: "Exceptional service rated by our valued customers"
+    },
+    {
+      value: "21",
+      label: "Avg. Days on Market",
+      description: "Faster sales through strategic marketing approach"
     }
-  }, [isSectionInView, controls]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission
-  };
+  ];
 
   return (
     <section 
-      id="stats" 
-      className="relative py-20"
-      style={{
-        backgroundImage: "url('/images/pattern.svg')",
-        backgroundRepeat: "repeat",
-        backgroundSize: "200px 200px", // Use the pattern's defined size
-        backgroundColor: "#f8f8f8", // Light background for contrast with pattern
-      }}
+      ref={sectionRef}
+      className="relative py-20 md:py-32 bg-white overflow-hidden"
     >
-      {/* Pattern Background Overlay (if needed for more subtle effect) */}
-      
-      {/* Stats Section */}
-      <div ref={sectionRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-        <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
-          {statsData.map((stat, index) => (
-            <StatCard
-              key={index}
-              number={stat.number}
-              label={stat.label}
-              delay={index * 0.2}
-              animationType={stat.animationType}
-            />
-          ))}
-        </div>
+      {/* Subtle background texture */}
+      <div className="absolute inset-0 opacity-[0.02]">
+        <div 
+          className="w-full h-full"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}
+        />
       </div>
 
-      {/* Contact Form Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 py-20 px-4 sm:px-6 lg:px-8"
+      <motion.div 
+        style={{ y }}
+        className="relative max-w-7xl mx-auto px-4"
       >
-        <div className="max-w-2xl mx-auto">
-          <motion.form
-            onSubmit={handleSubmit}
-            className="space-y-8"
-            animate={controls}
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16 md:mb-24"
+        >
+          <motion.h2 
+            className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-wide uppercase mb-6 text-gray-900"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-light tracking-wider uppercase text-charcoal mb-4">
-                Get in Touch
-              </h2>
-              <p className="text-charcoal/80 font-light text-lg">
-                Let's discuss your real estate needs
-              </p>
-            </div>
+            Proven Excellence
+          </motion.h2>
+          
+          <motion.div
+            className="w-24 h-px bg-gray-900 mx-auto mb-8"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          />
+          
+          <motion.p 
+            className="text-lg md:text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            Our track record speaks for itself. These numbers represent years of dedication 
+            to exceptional service and unparalleled results.
+          </motion.p>
+        </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-light text-charcoal/80 mb-2">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-light text-charcoal/80 mb-2">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-light text-charcoal/80 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-light text-charcoal/80 mb-2">
-                Phone
-              </label>
-              <input
-                type="tel"
-                className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-light text-charcoal/80 mb-2">
-                Message
-              </label>
-              <textarea
-                className="w-full px-4 py-3 bg-transparent border border-charcoal/20 rounded-lg focus:outline-none focus:border-charcoal/40 transition-colors h-32 resize-none"
-                required
-              />
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              className="w-full px-8 py-4 bg-charcoal text-white font-light tracking-wider uppercase text-sm hover:bg-charcoal/90 transition-all duration-300 rounded-lg"
-            >
-              Send Message
-            </motion.button>
-          </motion.form>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16 lg:gap-20">
+          {stats.map((stat, index) => (
+            <StatItem key={index} stat={stat} index={index} />
+          ))}
         </div>
+
+        {/* Bottom Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="text-center mt-20 md:mt-32"
+        >
+          <motion.div
+            className="w-24 h-px bg-gray-300 mx-auto mb-8"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ duration: 1, delay: 1 }}
+          />
+          
+          <motion.p 
+            className="text-base md:text-lg text-gray-600 font-light mb-8 max-w-xl mx-auto"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
+          >
+            Ready to experience the difference? Let's discuss your real estate goals.
+          </motion.p>
+          
+          <motion.button
+            whileHover={{ 
+              scale: 1.02,
+              boxShadow: "0 8px 25px rgba(0,0,0,0.1)"
+            }}
+            whileTap={{ scale: 0.98 }}
+            className="px-8 py-3 bg-gray-900 text-white font-medium tracking-wide uppercase text-sm hover:bg-gray-800 transition-all duration-300"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.4 }}
+          >
+            Get Started Today
+          </motion.button>
+        </motion.div>
       </motion.div>
     </section>
   );
 };
 
-export default Stats; 
+export default Stats;
+

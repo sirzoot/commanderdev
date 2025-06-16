@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "react-intersection-observer": "^9.16.0",
+    "react-player": "^2.16.0"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.2.0"
+  }
+}

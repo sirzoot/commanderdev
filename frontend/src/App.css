@@ -1,5 +1,23 @@
-#root {
-  width: 100%;
+/* Basic Reset */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll due to potential overflows */
+}
+
+/* Global Styles */
+body {
+  font-family: 'Montserrat', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+}
+
+/* Ensure the app takes full height */
+#root, .App {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -45,3 +63,5 @@ main {
 .read-the-docs {
   color: #888;
 }
+
+/* You can add more global styles here */
