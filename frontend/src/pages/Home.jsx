@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useEffect, useRef } from 'react';
-import Lenis from 'lenis';
+import { useRef } from 'react';
+import { useLenis } from '../components/ui/lenis_provider';
+import SectionTransition from '../components/ui/smoothsectiontransition';
 import Hero from '../components/home/Hero';
 import Stats from '../components/home/Stats';
 import FeaturedListings from '../components/home/FeaturedListings';
@@ -9,31 +10,8 @@ import CTAstrip from '../components/home/CTAstrip';
 
 const Home = () => {
   const containerRef = useRef(null);
+  const lenis = useLenis();
   const { scrollYProgress } = useScroll();
-
-  // Initialize Lenis smooth scroll
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      smoothTouch: false,
-      touchMultiplier: 2,
-    });
-
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   // Enhanced section transitions
   const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.85]);
@@ -57,7 +35,7 @@ const Home = () => {
           transformPerspective: 1000,
         }}
       >
-        <Hero />
+        <Hero lenis={lenis} />
       </motion.div>
 
       <motion.div
@@ -65,10 +43,41 @@ const Home = () => {
           y: nextSectionY,
         }}
       >
-        <FeaturedListings />
-        <Stats />
-        <Testimonials />
-        <CTAstrip />
+        {/* Featured Listings - Tight spacing from hero */}
+        <SectionTransition 
+          backgroundColor="bg-white"
+          nextBackgroundColor="bg-white"
+          spacing="tight"
+          className="pt-0"
+        >
+          <FeaturedListings />
+        </SectionTransition>
+        
+        {/* Stats Section - Clean white background */}
+        <SectionTransition 
+          backgroundColor="bg-white"
+          nextBackgroundColor="bg-gray-50"
+          spacing="normal"
+        >
+          <Stats />
+        </SectionTransition>
+        
+        {/* Testimonials Section - Subtle background change */}
+        <SectionTransition 
+          backgroundColor="bg-gray-50"
+          nextBackgroundColor="bg-gray-900"
+          spacing="normal"
+        >
+          <Testimonials />
+        </SectionTransition>
+        
+        {/* CTA Section - Dark background */}
+        <SectionTransition 
+          backgroundColor="bg-gray-900"
+          spacing="normal"
+        >
+          <CTAstrip />
+        </SectionTransition>
       </motion.div>
     </motion.main>
   );

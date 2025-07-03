@@ -40,8 +40,10 @@ const PropertyCard = ({ listing, index, isActive, onCardClick }) => {
         transformPerspective: 1000
       }}
       className={`relative w-[350px] md:w-[400px] lg:w-[450px] h-[500px] md:h-[550px] flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl cursor-pointer group ${
-        isActive ? 'z-20 ring-4 ring-white/50' : 'z-10'
-      } transition-all duration-300 transform-gpu`}
+        isActive 
+          ? 'z-20 scale-110 shadow-2xl' 
+          : 'z-10 scale-90 opacity-70'
+      } transition-all duration-500 ease-out transform-gpu`}
     >
       {/* Enhanced Image with Multiple Layers */}
       <motion.div 
@@ -202,17 +204,78 @@ const FeaturedListings = () => {
       beds: 5,
       baths: 4.5,
       location: 'McLean, VA 22101'
+    },
+    {
+      image: '/images/1823-westmoreland-st-mclean-va-22101/images-for-web-or-mls/1-web-or-mls-DSC04653.jpg',
+      price: 3250000,
+      title: '1823 Westmoreland St',
+      beds: 7,
+      baths: 6.5,
+      location: 'McLean, VA 22101'
+    },
+    {
+      image: '/images/181-e-reed-ave-alexandria-va-22305/images-for-web-or-mls/1-web-or-mls-DSC09195.jpg',
+      price: 895000,
+      title: '181 E Reed Ave',
+      beds: 3,
+      baths: 2.5,
+      location: 'Alexandria, VA 22305'
+    },
+    {
+      image: '/images/15092-rixeyville-lakes-ct-rixeyville-22737/images-for-web-or-mls/1-web-or-mls-10-print-DSC08172.jpg',
+      price: 1750000,
+      title: '15092 Rixeyville Lakes Ct',
+      beds: 5,
+      baths: 4,
+      location: 'Rixeyville, VA 22737'
+    },
+    {
+      image: '/images/truview hero/11-web-or-mls-ARC04382.jpg',
+      price: 2850000,
+      title: 'Luxury Estate Home',
+      beds: 6,
+      baths: 5.5,
+      location: 'Great Falls, VA 22066'
+    },
+    {
+      image: '/images/9480-virginia-center-blvd-vienna-va-22181/images-for-web-or-mls/1-web-or-mls-MAX_0225.JPG',
+      price: 725000,
+      title: 'Modern Townhome',
+      beds: 3,
+      baths: 2.5,
+      location: 'Reston, VA 20191'
+    },
+    {
+      image: '/images/8452-holly-leaf-dr-mclean-va-22102/images-for-web-or-mls/1-web-or-mls-ARC02129.jpg',
+      price: 1180000,
+      title: 'Contemporary Colonial',
+      beds: 4,
+      baths: 3.5,
+      location: 'Arlington, VA 22207'
     }
   ];
 
-  // Fixed carousel positioning - no scroll interference
-  const cardWidth = 470; // Fixed width including gap
-  const centerOffset = typeof window !== 'undefined' ? (window.innerWidth - 450) / 2 : 0;
+  // Simplified infinite carousel with perfect centering
+  const CARD_WIDTH = 450; // Fixed card width
+  const GAP = 20; // Gap between cards  
+  const TOTAL_CARD_WIDTH = CARD_WIDTH + GAP; // Total space per card
   
-  const targetX = -currentIndex * cardWidth + centerOffset;
+  const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  // Update viewport width on resize
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Perfect centering: viewport center - active card center
+  const viewportCenter = viewportWidth / 2;
+  const activeCardCenter = currentIndex * TOTAL_CARD_WIDTH + (CARD_WIDTH / 2);
+  const targetX = viewportCenter - activeCardCenter;
   const x = useSpring(targetX, { 
-    stiffness: 300, 
-    damping: 30,
+    stiffness: 200, 
+    damping: 40,
     restDelta: 0.001
   });
 
@@ -223,16 +286,7 @@ const FeaturedListings = () => {
     }
   }, [currentIndex, targetX, x, isDragging]);
 
-  // Auto-advance carousel
-  useEffect(() => {
-    if (!isInView || isDragging) return;
-    
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % listings.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isInView, listings.length, isDragging]);
+  // Remove auto-advance - let users control navigation
 
   const handleCardClick = (index) => {
     setCurrentIndex(index);
@@ -246,22 +300,24 @@ const FeaturedListings = () => {
     setIsDragging(false);
     
     // Calculate which card should be active based on drag distance
-    const dragThreshold = 100;
+    const dragThreshold = TOTAL_CARD_WIDTH / 3; // One third of card width
     if (Math.abs(info.offset.x) > dragThreshold) {
-      if (info.offset.x > 0 && currentIndex > 0) {
-        setCurrentIndex(currentIndex - 1);
-      } else if (info.offset.x < 0 && currentIndex < listings.length - 1) {
-        setCurrentIndex(currentIndex + 1);
+      if (info.offset.x > 0) {
+        // Dragged right - go to previous (with infinite wrap)
+        setCurrentIndex((prev) => prev > 0 ? prev - 1 : listings.length - 1);
+      } else {
+        // Dragged left - go to next (with infinite wrap)
+        setCurrentIndex((prev) => prev < listings.length - 1 ? prev + 1 : 0);
       }
     }
   };
 
   const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : listings.length - 1));
+    setCurrentIndex((prev) => prev > 0 ? prev - 1 : listings.length - 1);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev < listings.length - 1 ? prev + 1 : 0));
+    setCurrentIndex((prev) => prev < listings.length - 1 ? prev + 1 : 0);
   };
 
   return (
@@ -298,17 +354,24 @@ const FeaturedListings = () => {
       </motion.div>
 
       {/* Fixed Carousel Container */}
-      <div className="relative w-full h-[600px] flex items-center justify-center">
+      <div className="relative w-full h-[600px] flex items-center justify-center overflow-hidden">
+        {/* Visual indicator for draggable area */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-black/10 backdrop-blur-sm rounded-full text-xs text-gray-600 font-medium opacity-75 hover:opacity-100 transition-opacity">
+            Drag cards • Click arrows • Use dots below
+          </div>
+        </div>
         <motion.div
           ref={containerRef}
-          className="flex gap-5 cursor-grab active:cursor-grabbing"
-          style={{ x }}
+          className="flex cursor-grab active:cursor-grabbing select-none"
+          style={{ x, gap: `${GAP}px` }}
           drag="x"
           dragConstraints={{ 
-            left: -(listings.length - 1) * cardWidth, 
+            left: -(listings.length - 1) * TOTAL_CARD_WIDTH, 
             right: 0 
           }}
-          dragElastic={0.1}
+          dragElastic={0.05}
+          dragMomentum={false}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           whileDrag={{ cursor: "grabbing" }}
@@ -330,7 +393,6 @@ const FeaturedListings = () => {
           className="absolute left-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          disabled={currentIndex === 0}
         >
           <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -342,7 +404,6 @@ const FeaturedListings = () => {
           className="absolute right-4 z-30 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          disabled={currentIndex === listings.length - 1}
         >
           <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
