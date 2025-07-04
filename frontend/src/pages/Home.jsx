@@ -62,9 +62,9 @@ const Home = () => {
           <Stats />
         </SectionTransition>
         
-        {/* Testimonials Section - Subtle background change */}
+        {/* Testimonials Section - Clean white background */}
         <SectionTransition 
-          backgroundColor="bg-gray-50"
+          backgroundColor="bg-white"
           nextBackgroundColor="bg-gray-900"
           spacing="normal"
         >

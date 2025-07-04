@@ -60,8 +60,10 @@ export default {
         pearl: '#F8F6F0',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        serif: ['Poppins', 'serif'],
+        sans: ['Poppins', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Playfair Display', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+        body: ['Poppins', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['Playfair Display', 'Georgia', 'serif'],
       },
       fontSize: {
         'hero': ['clamp(3rem, 8vw, 7rem)', { lineHeight: '1.1', letterSpacing: '0.05em' }],

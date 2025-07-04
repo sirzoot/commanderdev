@@ -126,7 +126,7 @@ const Testimonials = () => {
         className="relative max-w-7xl mx-auto px-4 text-center mb-16"
       >
         <motion.h2 
-          className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-wider uppercase mb-6 text-gray-900"
+          className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-wider uppercase mb-6 text-gray-900"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}

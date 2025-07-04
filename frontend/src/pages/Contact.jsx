@@ -40,7 +40,7 @@ const Contact = () => {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-wider uppercase mb-8 text-gray-900">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif tracking-wider uppercase mb-8 text-gray-900">
               Let's Talk
             </h1>
             <motion.div

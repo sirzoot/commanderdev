@@ -14,15 +14,8 @@ const CTAstrip = () => {
   return (
     <motion.section
       ref={sectionRef}
-      className="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 py-32 overflow-hidden"
+      className="relative bg-navy py-32 overflow-hidden"
     >
-      {/* Sophisticated background treatment */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-charcoal-900 opacity-95" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,215,0,0.08)_0%,transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(255,215,0,0.06)_0%,transparent_60%)]" />
-        <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_50%,transparent_0deg,rgba(255,215,0,0.03)_60deg,transparent_120deg)]" />
-      </div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -35,13 +28,13 @@ const CTAstrip = () => {
             className="text-center lg:text-left"
           >
             <motion.h2 
-              className="text-hero font-light tracking-wider uppercase text-white mb-8 leading-none"
+              className="text-hero font-serif tracking-wider uppercase text-white mb-8 leading-none"
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <span className="block text-white/90 mb-2">Ready to Find</span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 drop-shadow-lg">
+              <span className="block text-white/90 mb-2 font-serif">Ready to Find</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 drop-shadow-lg font-serif">
                 Your Dream Home?
               </span>
             </motion.h2>

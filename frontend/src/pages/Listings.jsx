@@ -44,7 +44,8 @@ const ListingCard = ({ listing, onClick, size = 'normal' }) => {
         />
         
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
         
         {/* Hover overlay */}
         <motion.div 
@@ -54,10 +55,11 @@ const ListingCard = ({ listing, onClick, size = 'normal' }) => {
         
         {/* Price badge */}
         <motion.div 
-          className="absolute top-4 right-4 px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-medium uppercase tracking-wider rounded-sm"
+          className="absolute top-4 right-4 px-4 py-2 bg-gradient-to-r from-navy-800/95 to-navy-700/95 backdrop-blur-luxury text-gold-300 text-xs font-semibold uppercase tracking-wider rounded-lg border border-gold-400/30 shadow-luxury"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
+          whileHover={{ scale: 1.05 }}
         >
           {listing.price >= 1000000 ? `$${(listing.price / 1000000).toFixed(1)}M` : `$${(listing.price / 1000).toFixed(0)}K`}
         </motion.div>
@@ -71,20 +73,27 @@ const ListingCard = ({ listing, onClick, size = 'normal' }) => {
         transition={{ duration: 0.3 }}
       >
         <motion.h3 
-          className={`${currentTextSizes.title} font-light tracking-wide mb-2 line-clamp-2`}
+          className={`${currentTextSizes.title} font-semibold tracking-wide mb-2 line-clamp-2 text-gold-400`}
           whileHover={{ y: -2 }}
           transition={{ duration: 0.2 }}
+          style={{
+            textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 4px 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,1)'
+          }}
         >
           {listing.title}
         </motion.h3>
         
-        <motion.p 
-          className="text-sm font-light text-white/90 mb-3 line-clamp-1"
+        <motion.div 
+          className="mb-3"
           whileHover={{ y: -2 }}
           transition={{ duration: 0.2, delay: 0.05 }}
         >
-          {listing.location}
-        </motion.p>
+          <div className="inline-block px-2.5 py-1 bg-navy-900/85 backdrop-blur-sm border border-white/20 rounded-full shadow-lg">
+            <p className="text-xs font-medium text-white tracking-wider line-clamp-1">
+              {listing.location}
+            </p>
+          </div>
+        </motion.div>
         
         <motion.div 
           className={`flex gap-4 ${currentTextSizes.meta} font-light tracking-wider text-white/80 mb-4`}
@@ -97,14 +106,21 @@ const ListingCard = ({ listing, onClick, size = 'normal' }) => {
         </motion.div>
         
         <motion.div
-          className="transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
+          className="transform translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400"
         >
           <motion.button
-            whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.95)' }}
+            whileHover={{ 
+              scale: 1.02,
+              boxShadow: "0 15px 40px rgba(255,215,0,0.4)"
+            }}
             whileTap={{ scale: 0.98 }}
-            className="px-6 py-2 bg-white/90 text-gray-900 text-xs font-medium tracking-wider uppercase hover:bg-white/95 transition-all duration-300 backdrop-blur-sm rounded-sm"
+            className="group/btn relative px-8 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-navy-900 text-xs font-semibold tracking-wider uppercase overflow-hidden rounded-lg shadow-gold transition-all duration-400"
           >
-            View Details
+            <span className="relative z-10 flex items-center gap-2">
+              <span>View Details</span>
+              <span className="text-sm group-hover/btn:translate-x-1 transition-transform duration-300">→</span>
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-gold-400 to-gold-300 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-400 origin-left" />
           </motion.button>
         </motion.div>
       </motion.div>
@@ -137,16 +153,25 @@ const Listings = () => {
   const FilterButton = ({ label, value, options, onChange }) => (
     <div className="relative">
       <motion.button
-        whileHover={{ scale: 1.02 }}
+        whileHover={{ 
+          scale: 1.02,
+          boxShadow: activeFilter === label ? "0 15px 40px rgba(255,215,0,0.4)" : "0 10px 25px rgba(10,17,40,0.15)"
+        }}
         whileTap={{ scale: 0.98 }}
         onClick={() => setActiveFilter(activeFilter === label ? null : label)}
-        className={`px-6 py-3 rounded-full text-sm font-light tracking-wider uppercase transition-all duration-300 ${
+        className={`group relative px-8 py-4 rounded-full text-sm font-medium tracking-wider uppercase transition-all duration-400 overflow-hidden ${
           activeFilter === label 
-            ? 'bg-navy text-white' 
-            : 'bg-white/10 text-navy hover:bg-white/20'
+            ? 'bg-gradient-to-r from-gold-500 to-gold-400 text-navy-900 shadow-gold' 
+            : 'bg-white/80 text-navy-700 hover:bg-white/95 shadow-lg border border-gold-200/20'
         }`}
       >
-        {label}
+        <span className="relative z-10 flex items-center gap-2">
+          {label}
+          {activeFilter === label && <span className="text-xs">▼</span>}
+        </span>
+        {activeFilter !== label && (
+          <div className="absolute inset-0 bg-gradient-to-r from-gold-400/20 to-gold-300/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
+        )}
       </motion.button>
       
       <AnimatePresence>
@@ -309,7 +334,7 @@ const Listings = () => {
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="sticky top-16 z-30 bg-white/95 backdrop-blur-sm rounded-full shadow-lg p-4 mb-8 flex items-center justify-between"
+          className="sticky top-16 z-30 bg-white rounded-full shadow-xl p-6 mb-12 flex items-center justify-between border-2 border-gold-200/40"
         >
           <div className="flex items-center gap-4">
             <FilterButton
@@ -370,7 +395,10 @@ const Listings = () => {
           </div>
           
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ 
+              scale: 1.02,
+              boxShadow: "0 10px 25px rgba(255,215,0,0.2)"
+            }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setFilters({
               priceRange: 'all',
@@ -379,9 +407,10 @@ const Listings = () => {
               type: 'all',
               location: 'all'
             })}
-            className="px-6 py-3 text-sm font-light tracking-wider uppercase text-gray-600 hover:text-navy transition-colors duration-300"
+            className="group relative px-8 py-4 text-sm font-medium tracking-wider uppercase text-navy-600 hover:text-gold-600 transition-all duration-400 border border-gold-300/30 rounded-full hover:border-gold-400/60 backdrop-blur-sm"
           >
-            Reset
+            <span className="relative z-10">Reset</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-gold-400/10 to-gold-300/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-center rounded-full" />
           </motion.button>
         </motion.div>
 
@@ -413,13 +442,16 @@ const Listings = () => {
             transition={{ duration: 0.5 }}
             className="hidden lg:block w-80 flex-shrink-0"
           >
-            <div className="sticky top-24 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6 border border-gray-100">
-              <h2 className="text-2xl font-light tracking-wider uppercase mb-6">Filters</h2>
+            <div className="sticky top-24 bg-gradient-to-br from-white/95 via-pearl/90 to-white/95 backdrop-blur-luxury rounded-xl shadow-luxury p-8 border border-gold-200/30">
+              <h2 className="text-2xl font-light tracking-wider uppercase mb-8 text-navy-800 flex items-center gap-3">
+                <span className="text-gold-500">✨</span>
+                Filters
+              </h2>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Price Range</label>
+                  <label className="block text-sm font-medium tracking-wider text-navy-600 mb-3">Price Range</label>
                   <select
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    className="w-full px-4 py-3 rounded-lg border border-gold-300/40 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 font-light tracking-wider bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gold-400/60"
                     value={filters.priceRange}
                     onChange={(e) => setFilters({ ...filters, priceRange: e.target.value })}
                   >
@@ -432,9 +464,9 @@ const Listings = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Bedrooms</label>
+                  <label className="block text-sm font-medium tracking-wider text-navy-600 mb-3">Bedrooms</label>
                   <select
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    className="w-full px-4 py-3 rounded-lg border border-gold-300/40 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 font-light tracking-wider bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gold-400/60"
                     value={filters.beds}
                     onChange={(e) => setFilters({ ...filters, beds: e.target.value })}
                   >
@@ -447,9 +479,9 @@ const Listings = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Bathrooms</label>
+                  <label className="block text-sm font-medium tracking-wider text-navy-600 mb-3">Bathrooms</label>
                   <select
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    className="w-full px-4 py-3 rounded-lg border border-gold-300/40 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 font-light tracking-wider bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gold-400/60"
                     value={filters.baths}
                     onChange={(e) => setFilters({ ...filters, baths: e.target.value })}
                   >
@@ -461,9 +493,9 @@ const Listings = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-light tracking-wider text-gray-600 mb-2">Property Type</label>
+                  <label className="block text-sm font-medium tracking-wider text-navy-600 mb-3">Property Type</label>
                   <select
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gold font-light tracking-wider"
+                    className="w-full px-4 py-3 rounded-lg border border-gold-300/40 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:border-gold-400 font-light tracking-wider bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-gold-400/60"
                     value={filters.type}
                     onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                   >
@@ -475,7 +507,10 @@ const Listings = () => {
                 </div>
 
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ 
+                    scale: 1.02,
+                    boxShadow: "0 10px 25px rgba(255,215,0,0.3)"
+                  }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setFilters({
                     priceRange: 'all',
@@ -483,9 +518,10 @@ const Listings = () => {
                     baths: 'all',
                     type: 'all'
                   })}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-600 font-light tracking-wider hover:bg-gray-50 transition-all duration-300"
+                  className="group relative w-full px-6 py-4 border-2 border-gold-300/60 text-navy-700 font-medium tracking-wider hover:bg-gold-50 transition-all duration-400 rounded-lg overflow-hidden"
                 >
-                  Reset Filters
+                  <span className="relative z-10">Reset Filters</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-gold-400/20 to-gold-300/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                 </motion.button>
               </div>
             </div>
@@ -621,7 +657,9 @@ const Listings = () => {
         <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-3xl rounded-lg bg-white p-6">
+          <Dialog.Panel className="mx-auto max-w-3xl rounded-2xl bg-white p-8 border-2 border-gold-300/30 shadow-2xl relative overflow-hidden">
+            {/* Elegant background accent */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold-400 via-gold-300 to-gold-400"></div>
             {selectedListing && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
@@ -632,10 +670,10 @@ const Listings = () => {
                   />
                 </div>
                 <div>
-                  <Dialog.Title className="text-2xl font-light tracking-wider uppercase mb-2">
+                  <Dialog.Title className="text-2xl font-serif tracking-wider uppercase mb-2">
                     {selectedListing.title}
                   </Dialog.Title>
-                  <p className="text-3xl font-light text-gold mb-4">
+                  <p className="text-3xl font-serif text-gold mb-4">
                     ${selectedListing.price.toLocaleString()}
                   </p>
                   <div className="grid grid-cols-2 gap-4 mb-6">
@@ -657,11 +695,18 @@ const Listings = () => {
                     </div>
                   </div>
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      boxShadow: "0 15px 40px rgba(255,215,0,0.4)"
+                    }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full px-8 py-3 bg-navy text-white font-light tracking-wider uppercase text-sm hover:bg-charcoal transition-all duration-300"
+                    className="group relative w-full px-12 py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-navy-900 font-semibold tracking-wider uppercase text-sm overflow-hidden rounded-lg shadow-gold transition-all duration-400"
                   >
-                    Schedule a Viewing
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      <span>Schedule a Viewing</span>
+                      <span className="text-lg group-hover:translate-x-1 transition-transform duration-300">→</span>
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-gold-400 to-gold-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                   </motion.button>
                 </div>
               </div>

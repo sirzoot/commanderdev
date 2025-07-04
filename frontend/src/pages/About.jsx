@@ -32,7 +32,7 @@ const TimelineItem = ({ year, title, description, image, delay, index }) => {
               transition={{ duration: 0.8, delay: delay + 0.4 }}
             />
           </div>
-          <h3 className="text-2xl md:text-3xl font-light tracking-wide text-gray-900">{title}</h3>
+          <h3 className="text-2xl md:text-3xl font-serif tracking-wide text-gray-900">{title}</h3>
           <p className="text-lg font-light text-gray-600 leading-relaxed">{description}</p>
         </motion.div>
         
@@ -107,7 +107,7 @@ const TeamMember = ({ member, isActive, onClick }) => {
       </div>
       
       <div className="text-center px-4">
-        <h3 className="text-xl font-light tracking-wide text-gray-900 mb-2 group-hover:text-navy-700 transition-colors duration-300">{member.name}</h3>
+        <h3 className="text-xl font-serif tracking-wide text-gray-900 mb-2 group-hover:text-navy-700 transition-colors duration-300">{member.name}</h3>
         <p className="text-gold-600 font-medium tracking-wider uppercase text-sm mb-4 group-hover:text-gold-700 transition-colors duration-300">{member.title}</p>
         <p className="text-gray-600 font-light leading-relaxed text-sm group-hover:text-gray-700 transition-colors duration-300">{member.description}</p>
       </div>
@@ -200,8 +200,8 @@ const About = () => {
             alt="Showcase Real Estate"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/85" />
-          <div className="absolute inset-0 bg-gradient-to-r from-navy-900/40 via-transparent to-navy-900/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/70 to-black/90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-navy-900/50 via-navy-900/20 to-navy-900/50" />
         </div>
         
         <motion.div 
@@ -215,13 +215,13 @@ const About = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-hero font-light tracking-wider uppercase mb-12 text-white drop-shadow-2xl"
+            className="text-hero font-serif tracking-wider uppercase mb-12 text-white drop-shadow-2xl"
             style={{
               textShadow: '0 4px 8px rgba(0,0,0,0.8), 0 8px 16px rgba(0,0,0,0.6), 0 16px 32px rgba(0,0,0,0.4)'
             }}
           >
-            <span className="block text-white/95 mb-2">Our</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500">
+            <span className="block text-white/95 mb-2 font-serif">Our</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 font-serif">
               Story
             </span>
           </motion.h1>
@@ -270,7 +270,7 @@ const About = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-wider uppercase mb-6">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-wider uppercase mb-6">
               Our Journey
             </h2>
             <motion.div
@@ -307,7 +307,7 @@ const About = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-wider uppercase mb-6">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif tracking-wider uppercase mb-6">
               Meet Our Team
             </h2>
             <motion.div
@@ -474,8 +474,8 @@ const About = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <span className="block text-white/95 mb-2">Work with a Team</span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500">
+              <span className="block text-white/95 mb-2 font-serif">Work with a Team</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 font-serif">
                 You Can Trust
               </span>
             </motion.h2>

@@ -87,23 +87,30 @@ const PropertyCard = ({ listing, index, isActive, onCardClick }) => {
         transition={{ delay: index * 0.15 + 0.3 }}
       >
         <motion.h3 
-          className="text-2xl md:text-3xl font-light mb-3"
+          className="text-2xl md:text-3xl font-serif font-semibold mb-3 text-gold-400"
           animate={{
             y: isHovered ? -5 : 0
+          }}
+          style={{
+            textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 4px 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,1)'
           }}
         >
           {listing.title}
         </motion.h3>
         
-        <motion.p 
-          className="text-lg md:text-xl font-light mb-4 opacity-90"
+        <motion.div 
+          className="inline-block mb-4"
           animate={{
             y: isHovered ? -5 : 0
           }}
           transition={{ delay: 0.1 }}
         >
-          {listing.location}
-        </motion.p>
+          <div className="px-3 py-1.5 bg-navy-900/85 backdrop-blur-sm border border-white/20 rounded-full shadow-lg">
+            <p className="text-sm font-medium text-white tracking-wider">
+              {listing.location}
+            </p>
+          </div>
+        </motion.div>
         
         <motion.div 
           className="flex gap-6 mb-4"
@@ -335,7 +342,7 @@ const FeaturedListings = () => {
         className="relative max-w-7xl mx-auto px-4 text-center mb-12 md:mb-16"
       >
         <motion.h2 
-          className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-wider uppercase mb-6 text-gray-900"
+          className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-wider uppercase mb-6 text-gray-900"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}

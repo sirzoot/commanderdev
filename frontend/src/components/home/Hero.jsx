@@ -436,7 +436,10 @@ const VideoHero = ({ lenis }) => {
             </motion.div>
 
             <motion.h1 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-4 tracking-wide uppercase drop-shadow-lg relative z-20"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif mb-4 tracking-wide uppercase relative z-20 text-white"
+              style={{
+                textShadow: '0 4px 8px rgba(0,0,0,0.8), 0 8px 16px rgba(0,0,0,0.6), 0 16px 32px rgba(0,0,0,0.4)'
+              }}
               initial={{ opacity: 0, y: 20 }}
               animate={loadingComplete ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.7 }}
@@ -445,7 +448,10 @@ const VideoHero = ({ lenis }) => {
             </motion.h1>
             
             <motion.p 
-              className="text-lg md:text-xl mb-10 font-light tracking-wider uppercase opacity-90 drop-shadow-md relative z-20"
+              className="text-lg md:text-xl mb-10 font-light tracking-wider uppercase relative z-20 text-white/95"
+              style={{
+                textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 8px rgba(0,0,0,0.6)'
+              }}
               initial={{ opacity: 0, y: 15 }}
               animate={loadingComplete ? { opacity: 0.9, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.9 }}

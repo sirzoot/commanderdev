@@ -156,7 +156,7 @@ const Stats = () => {
           className="text-center mb-16 md:mb-24"
         >
           <motion.h2 
-            className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-wide uppercase mb-6 text-gray-900"
+            className="text-4xl sm:text-5xl lg:text-6xl font-serif tracking-wide uppercase mb-6 text-gray-900"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
